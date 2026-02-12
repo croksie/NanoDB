@@ -1,7 +1,0 @@
-<Solution>
-  <Configurations>
-    <Platform Name="x64" />
-    <Platform Name="x86" />
-  </Configurations>
-  <Project Path="NanoDB.vcxproj" Id="37d405fe-d6f3-4346-8bb8-c97bd073570e" />
-</Solution>
