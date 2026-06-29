@@ -14,6 +14,8 @@ int main() {
     try {
         DataValue* val = db.get("user:101:name");
         val->display(); // Devrait afficher: [String] Alice
+        val = db.get("user:101:age");
+        val->display();
     }
     catch (const DatabaseException& e) {
         std::cerr << e.what() << std::endl;
