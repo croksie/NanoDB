@@ -13,11 +13,12 @@ public:
 class StringValue : public DataValue
 {
 public:
+    StringValue() {};
     StringValue(const std::string& Value);
     void display() override;
 
 private:
-    std::string Value;
+    std::string Value = "";
 };
 
 //Int Value

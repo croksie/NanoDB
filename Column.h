@@ -4,7 +4,7 @@
 
 class Column
 {
-	DataValue* data;
-	std::string name;
+	const DataValue* data;
+	const std::string name;
 };
 
