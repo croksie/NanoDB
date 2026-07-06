@@ -137,6 +137,7 @@
     <ClCompile Include="Column.cpp" />
     <ClCompile Include="Database.cpp" />
     <ClCompile Include="DatabaseException.cpp" />
+    <ClCompile Include="DataType.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Page.cpp" />
     <ClCompile Include="Table.cpp" />
