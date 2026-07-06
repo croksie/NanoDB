@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Database.h"
-#include "DataValue.h"
+#include "DataType.h"
 #include "DatabaseException.h"
 
 
@@ -31,17 +31,25 @@
 int main() {
     Database db;
 
-    DataValue col = new StringValue("Row1");
-    db.createTable("Personne", {new StringValue("Row1")});
+    std::vector<Column> cols;
+    cols.push_back(Column(new IntType(), "Id"));
+    cols.push_back(Column(new StringType(), "name"));
 
+    db.createTable("Utilisateurs", cols);
 
+    Table* utilisateur = db.getTable("Utilisateurs");
 
+    utilisateur->addTuple({ 1,"John" });
+    utilisateur->addTuple({ 2,"Simon" });
+    utilisateur->addTuple({ 3,"Martin" });
+    utilisateur->displayTable();
     //code
 
-
+    db.stats();
 
     db.deleteTable("Personne");
     
 
     return 0;
 }
+

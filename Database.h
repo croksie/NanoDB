@@ -17,6 +17,8 @@ public:
 	void clear();
 	void stats();
 
+
+	Table* getTable(std::string name);
 	void createTable(std::string name, std::vector<Column> collumn);
 	void deleteTable(std::string name);
 private:

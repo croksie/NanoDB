@@ -3,7 +3,7 @@
 
 
 
-Table::Table(std::string name, std::vector<Column> column) : column(column), name(name) {
+Table::Table(std::string name, std::vector<Column> column) : columns(column), name(name) {
 
 }
 
@@ -13,8 +13,34 @@ std::string Table::getName() const {
 }
 
 
-bool Table::addTuple(std::vector<DataValue> datas) {
-	if (datas.size() != this->column.size()) {
-		throw new DatabaseException("Les donées fournie sont imcompatibles avec la structure de la table");
+void Table::addTuple(std::vector<std::any> data) {
+	this->tuples.push_back(Tuple(data));
+}
+
+void Table::displayTable()
+{
+	for (Tuple& t : this->tuples) {
+		for (auto& data : t.data) {
+			std::cout << this->anyToString(data) << " ";
+		}
+		std::cout << std::endl;
 	}
+}
+
+
+std::string Table::anyToString(const std::any& a) {
+    if (a.type() == typeid(int)) {
+        return std::to_string(std::any_cast<int>(a));
+    }
+    else if (a.type() == typeid(double)) {
+        return std::to_string(std::any_cast<double>(a));
+    }
+    else if (a.type() == typeid(std::string)) {
+        return std::any_cast<std::string>(a);
+    }
+    else if (a.type() == typeid(const char*)) {
+        return std::string(std::any_cast<const char*>(a));
+    }
+    // Ajoute d'autres types ici
+    return "[unknown]";
 }

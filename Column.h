@@ -1,10 +1,17 @@
 #pragma once
 #include <string>
-#include "DataValue.h"
+#include "DataType.h"
 
 class Column
 {
-	const DataValue* data;
 	const std::string name;
+	const DataType* data;
+
+	//Constraints
+
+	const bool isNullable = false;
+
+public:
+	Column(DataType* dataType, std::string name) : data(dataType), name(name) {}
 };
 

@@ -35,6 +35,16 @@ void Database::stats() {
 
 
 
+Table* Database::getTable(std::string name)
+{
+	for (Table& t : this->tables) {
+		if (t.getName() == name) {
+			return &t;
+		}
+	}
+	return nullptr;
+}
+
 void Database::createTable(std::string name, std::vector<Column> collumn) {
 	Table table = Table(name, collumn);
 	this->tables.push_back(table);
