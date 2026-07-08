@@ -13,34 +13,31 @@ std::string Table::getName() const {
 }
 
 
-void Table::addTuple(std::vector<std::any> data) {
-	this->tuples.push_back(Tuple(data));
+void Table::addTuple(std::vector<std::unique_ptr<DataValue>> data) {
+	std::vector<std::byte> result;
+	for (auto i = 0; i < this->columns.size(); i++) {
+		Column c = this->columns.at(i);
+		if (c.getDataType()->getTypeName() != data.at(i)->type) {
+			throw new DatabaseException("Le type ne conrrespond pas à la structure de la table");
+		}
+		else {
+			std::vector<std::byte> tmp = c.getDataType()->serialize(data.at(i)->getValue());
+			result.insert(result.end(), tmp.begin(), tmp.end());
+		}
+	}
+
+	this->tuples.push_back(Tuple(result));
 }
 
 void Table::displayTable()
 {
 	for (Tuple& t : this->tuples) {
-		for (auto& data : t.data) {
-			std::cout << this->anyToString(data) << " ";
+		size_t offset = 0;
+		for (auto i = 0; i < this->columns.size(); i++) {
+			Column c = this->columns.at(i);
+			std::unique_ptr<DataValue> valuePtr = c.getDataType()->deserialize(t.data, offset);
+			std::cout << valuePtr->toString() << " ";
 		}
 		std::cout << std::endl;
 	}
-}
-
-
-std::string Table::anyToString(const std::any& a) {
-    if (a.type() == typeid(int)) {
-        return std::to_string(std::any_cast<int>(a));
-    }
-    else if (a.type() == typeid(double)) {
-        return std::to_string(std::any_cast<double>(a));
-    }
-    else if (a.type() == typeid(std::string)) {
-        return std::any_cast<std::string>(a);
-    }
-    else if (a.type() == typeid(const char*)) {
-        return std::string(std::any_cast<const char*>(a));
-    }
-    // Ajoute d'autres types ici
-    return "[unknown]";
 }

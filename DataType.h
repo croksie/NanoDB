@@ -2,39 +2,40 @@
 #include <string>
 #include <vector>
 #include <any>
+#include <memory>
+#include "DataValue.h"
 
 
 class DataType {
-
 private:
-	const std::string typeName;
+	const Type type;
 	const bool isFixedSize;
 	const int maxSize;
 
 public:
-	DataType(std::string typeName, bool fixed, int max)
-		: typeName(std::move(typeName)), isFixedSize(fixed), maxSize(max) {}
+	DataType(Type t, bool fixed, int max)
+		: type(t), isFixedSize(fixed), maxSize(max) {}
 
 	virtual ~DataType() = default;
 
 	virtual std::vector<std::byte> serialize(const std::any& value) = 0;
-	virtual std::any deserialize(const std::vector<std::byte>& data) = 0;
+	virtual std::unique_ptr<DataValue> deserialize(const std::vector<std::byte>& data, size_t& offset) = 0;
 
-	const std::string& getTypeName() const { return typeName; }
+	const Type getTypeName() const { return type; }
 	bool getIsFixedSize() const { return isFixedSize; }
 	int getMaxSize() const { return maxSize; }
 };
 
 class IntType : public DataType {
 public:
-	IntType() : DataType("Int", true, sizeof(int)) {}
+	IntType() : DataType(Type::Number, true, sizeof(int)) {}
 	std::vector<std::byte> serialize(const std::any& value) override;
-	std::any deserialize(const std::vector<std::byte>& data) override;
+	std::unique_ptr<DataValue> deserialize(const std::vector<std::byte>& data, size_t& offset) override;
 };
 
 class StringType : public DataType {
 public:
-	StringType() : DataType("String", true, 255) {}
+	StringType() : DataType(Type::Varchar, true, 255) {}
 	std::vector<std::byte> serialize(const std::any& value) override;
-	std::any deserialize(const std::vector<std::byte>& data) override;
+	std::unique_ptr<DataValue> deserialize(const std::vector<std::byte>& data, size_t& offset) override;
 };

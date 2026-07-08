@@ -1,8 +1,10 @@
 #pragma once
 #include <vector>
+#include <memory>
 #include "Column.h"
 #include "Page.h"
 #include "DataType.h"
+#include "DataValue.h"
 #include "Tuple.h"
 
 class Table
@@ -21,10 +23,9 @@ public:
 
 	std::string getName() const;
 
-	void addTuple(std::vector<std::any> data);
+	void addTuple(std::vector<std::unique_ptr<DataValue>> data);
 
 
 	void displayTable();
-	std::string anyToString(const std::any& a);
 };
 

@@ -1,17 +1,20 @@
 #pragma once
 #include <string>
+#include <memory>
 #include "DataType.h"
 
 class Column
 {
-	const std::string name;
-	const DataType* data;
+	std::string name;
+	std::shared_ptr<DataType> data;
 
 	//Constraints
 
-	const bool isNullable = false;
+	bool isNullable = false;
 
 public:
-	Column(DataType* dataType, std::string name) : data(dataType), name(name) {}
+	Column(std::shared_ptr<DataType> dataType, std::string name) : data(dataType), name(name) {}
+	~Column() = default;
+	std::shared_ptr<DataType> getDataType() const { return this->data; }
 };
 

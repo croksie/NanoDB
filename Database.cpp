@@ -52,9 +52,12 @@ void Database::createTable(std::string name, std::vector<Column> collumn) {
 
 void Database::deleteTable(std::string name) {
 
-	for (auto it = this->tables.begin(); it != this->tables.end(); it++) {
+	for (auto it = this->tables.begin(); it != this->tables.end();) {
 		if (it->getName() == name) {
 			it = this->tables.erase(it);
+		}
+		else{
+			it++;
 		}
 	}
 }

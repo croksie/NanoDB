@@ -1,7 +1,6 @@
 #include "DataType.h"
 
 
-
  /* ******************* Int ******************* */
 
 //
@@ -16,13 +15,14 @@ std::vector<std::byte> IntType::serialize(const std::any& value)
     return result;
 }
 
-std::any IntType::deserialize(const std::vector<std::byte>& data)
+
+std::unique_ptr<DataValue> IntType::deserialize(const std::vector<std::byte>& data, size_t& offset)
 {
     int value = 0;
     for (size_t i = 0; i < sizeof(int) && i < data.size(); ++i)
         value |= static_cast<int>(std::to_integer<unsigned char>(data[i])) << (8 * i);
-
-    return value;
+    offset += sizeof(int);
+    return std::make_unique<IntValue>(value);
 }
 
 
@@ -51,11 +51,11 @@ std::vector<std::byte> StringType::serialize(const std::any& value)
 }
 
 
-std::any StringType::deserialize(const std::vector<std::byte>& data)
+std::unique_ptr<DataValue> StringType::deserialize(const std::vector<std::byte>& data, size_t& offset)
 {
     if (data.size() < sizeof(size_t))
     {
-        return std::string();
+        return std::make_unique<StringValue>(std::string());
     }
 
     size_t length = 0;
@@ -72,6 +72,6 @@ std::any StringType::deserialize(const std::vector<std::byte>& data)
     {
         value.push_back(static_cast<char>(data[sizeof(size_t) + i]));
     }
-
-    return value;
+    offset += sizeof(size_t) + length;
+    return std::make_unique<StringValue>(value);
 }
