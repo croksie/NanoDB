@@ -20,7 +20,7 @@ std::unique_ptr<DataValue> IntType::deserialize(const std::vector<std::byte>& da
 {
     int value = 0;
     for (size_t i = 0; i < sizeof(int) && i < data.size(); ++i)
-        value |= static_cast<int>(std::to_integer<unsigned char>(data[i])) << (8 * i);
+        value |= static_cast<int>(std::to_integer<unsigned char>(data[i + offset])) << (8 * i);
     offset += sizeof(int);
     return std::make_unique<IntValue>(value);
 }
@@ -61,7 +61,7 @@ std::unique_ptr<DataValue> StringType::deserialize(const std::vector<std::byte>&
     size_t length = 0;
     for (size_t i = 0; i < sizeof(size_t); ++i)
     {
-        length |= static_cast<size_t>(std::to_integer<unsigned char>(data[i])) << (8 * i);
+        length |= static_cast<size_t>(std::to_integer<unsigned char>(data[i + offset])) << (8 * i);
     }
 
     length = std::min(length, data.size() - sizeof(size_t));
@@ -70,7 +70,7 @@ std::unique_ptr<DataValue> StringType::deserialize(const std::vector<std::byte>&
     value.reserve(length);
     for (size_t i = 0; i < length; ++i)
     {
-        value.push_back(static_cast<char>(data[sizeof(size_t) + i]));
+        value.push_back(static_cast<char>(data[sizeof(size_t) + i + offset]));
     }
     offset += sizeof(size_t) + length;
     return std::make_unique<StringValue>(value);
