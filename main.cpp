@@ -17,14 +17,15 @@ int main() {
     std::vector<Column> cols;
     cols.push_back(Column(std::make_shared<IntType>(), "Id"));
     cols.push_back(Column(std::make_shared<StringType>(), "name"));
+    cols.push_back(Column(std::make_shared<IntType>(), "note"));
 
     db.createTable("Utilisateurs", cols);
 
     Table* utilisateur = db.getTable("Utilisateurs");
 
-    utilisateur->addTuple(row(std::make_unique<IntValue>(1), std::make_unique<StringValue>("John")));
-    utilisateur->addTuple(row(std::make_unique<IntValue>(2), std::make_unique<StringValue>("Simon")));
-    utilisateur->addTuple(row(std::make_unique<IntValue>(3), std::make_unique<StringValue>("Martin")));
+    utilisateur->addTuple(row(std::make_unique<IntValue>(1), std::make_unique<StringValue>("John"), std::make_unique<IntValue>(20)));
+    utilisateur->addTuple(row(std::make_unique<IntValue>(2), std::make_unique<StringValue>("Simon"), std::make_unique<IntValue>(10)));
+    utilisateur->addTuple(row(std::make_unique<IntValue>(3), std::make_unique<StringValue>("Martin"), std::make_unique<IntValue>(55)));
 
     utilisateur->displayTable();
 

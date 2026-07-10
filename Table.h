@@ -14,6 +14,7 @@ private:
 	std::string name;
 	std::vector<Column> columns;
 	std::vector<Tuple> tuples;
+	Page page = Page();
 
 
 	//std::vector<Page> pages;
@@ -24,7 +25,7 @@ public:
 	std::string getName() const;
 
 	void addTuple(std::vector<std::unique_ptr<DataValue>> data);
-
+	Tuple createTuple(int slotIndex);
 
 	void displayTable();
 };
