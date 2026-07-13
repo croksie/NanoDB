@@ -139,6 +139,7 @@
     <ClCompile Include="DatabaseException.cpp" />
     <ClCompile Include="DataType.cpp" />
     <ClCompile Include="DataValue.cpp" />
+    <ClCompile Include="DiskManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Page.cpp" />
     <ClCompile Include="Table.cpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="DatabaseException.h" />
     <ClInclude Include="DataType.h" />
     <ClInclude Include="DataValue.h" />
+    <ClInclude Include="DiskManager.h" />
     <ClInclude Include="Page.h" />
     <ClInclude Include="Table.h" />
     <ClInclude Include="Tuple.h" />

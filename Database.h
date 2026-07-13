@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <memory>
 #include <vector>
+#include "BufferManager.h"
 #include "Table.h"
 
 
@@ -10,6 +11,8 @@
 class Database
 {
 public: 
+	BufferManager bm = BufferManager();
+
 	void clear();
 	void stats();
 

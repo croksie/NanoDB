@@ -3,33 +3,18 @@
 
 
 
-Table::Table(std::string name, std::vector<Column> column) : columns(column), name(name) {
-
+Table::Table(std::string name, std::vector<Column> column, BufferManager& bm) : columns(column), name(name), bm(bm), loadedPage(bm.getPage(0)){
+	//Page p = Page();
+	//dm.writePage(p);
+	this->loadedPage = bm.getPage(0);
 }
-
 
 std::string Table::getName() const {
 	return this->name;
 }
 
 
-//void Table::addTuple(std::vector<std::unique_ptr<DataValue>> data) {
-//	std::vector<std::byte> result;
-//	for (auto i = 0; i < this->columns.size(); i++) {
-//		Column c = this->columns.at(i);
-//		if (c.getDataType()->getTypeName() != data.at(i)->type) {
-//			throw new DatabaseException("Le type ne conrrespond pas à la structure de la table");
-//		}
-//		else {
-//			std::vector<std::byte> tmp = c.getDataType()->serialize(data.at(i)->getValue());
-//			result.insert(result.end(), tmp.begin(), tmp.end());
-//		}
-//	}
-//
-//	this->tuples.push_back(Tuple(result));
-//}
-
-void Table::addTuple(std::vector<std::unique_ptr<DataValue>> data) {
+void Table::insertTuple(std::vector<std::unique_ptr<DataValue>> data) {
 	std::vector<std::byte> result;
 	for (auto i = 0; i < this->columns.size(); i++) {
 		Column c = this->columns.at(i);
@@ -42,34 +27,35 @@ void Table::addTuple(std::vector<std::unique_ptr<DataValue>> data) {
 		}
 	}
 	Tuple tuple = Tuple(result);
-	this->page.insertTuple(tuple);
+	insertTupleIntoPage(tuple);
 
+}
+
+void Table::insertTupleIntoPage(Tuple& tuple)
+{
+	try
+	{
+		this->loadedPage.insertTuple(tuple);
+	}
+	catch (const DatabaseException&)
+	{
+		this->nextPage();
+		this->insertTupleIntoPage(tuple);
+	}
 }
 
 Tuple Table::createTuple(int slotIndex)
 {
-	std::vector<std::byte> data = this->page.getTuple(slotIndex);
+	std::vector<std::byte> data = this->loadedPage.getTuple(slotIndex);
 
 	return Tuple(data);
 }
 
-//void Table::displayTable()
-//{
-//	for (Tuple& t : this->tuples) {
-//		size_t offset = 0;
-//		for (auto i = 0; i < this->columns.size(); i++) {
-//			Column c = this->columns.at(i);
-//			std::unique_ptr<DataValue> valuePtr = c.getDataType()->deserialize(t.data, offset);
-//			std::cout << valuePtr->toString() << " ";
-//		}
-//		std::cout << std::endl;
-//	}
-//}
 
 void Table::displayTable()
 {
-	for (int i = 0; i < this->page.slotCount; ++i) {
-		std::vector<std::byte> tuple = this->page.getTuple(i);
+	for (int i = 0; i < this->loadedPage.slotCount; ++i) {
+		std::vector<std::byte> tuple = this->loadedPage.getTuple(i);
 
 		size_t offset = 0;
 		for (auto i = 0; i < this->columns.size(); i++) {
@@ -78,5 +64,26 @@ void Table::displayTable()
 			std::cout << valuePtr->toString() << " ";
 		}
 		std::cout << std::endl;
+	}
+}
+
+void Table::nextPage()
+{
+	int pageId = this->loadedPage.nextPageId;
+	if (pageId == 0) {
+		int newPageId = this->bm.allocatePage();
+		Page newPage = Page(newPageId, this->loadedPage.pageId);
+		this->bm.saveNewPage(newPage);
+	}
+	this->bm.flushPage(this->loadedPage.pageId);
+	this->loadedPage = this->bm.getPage(pageId);
+}
+
+void Table::prevPage()
+{
+	int pageId = this->loadedPage.prevPageId;
+	if (pageId != 0) {
+		this->bm.flushPage(this->loadedPage.pageId);
+		this->loadedPage = this->bm.getPage(pageId);
 	}
 }

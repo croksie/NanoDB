@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
-
 #include "Tuple.h"
+
+constexpr auto PAGE_SIZE = 4096;
+constexpr auto HEADER_SIZE = 16;
 
 class Page
 {
@@ -16,6 +18,10 @@ public:
 	int slotCount = 0;
 
 	Page();
+	Page(std::vector<std::byte> data);
+	Page(int pageId, int prevPageId);
+
+	std::vector<std::byte> serialize() const;
 
 	void insertTuple(Tuple& tuple);
 	std::vector<std::byte> getTuple(int slotIndex) const;

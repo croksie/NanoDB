@@ -46,8 +46,7 @@ Table* Database::getTable(std::string name)
 }
 
 void Database::createTable(std::string name, std::vector<Column> collumn) {
-	Table table = Table(name, collumn);
-	this->tables.push_back(table);
+	this->tables.emplace_back(name, collumn, this->bm);
 }
 
 void Database::deleteTable(std::string name) {
