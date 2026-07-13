@@ -3,6 +3,7 @@
 #include <vector>
 #include <any>
 #include <memory>
+#include <cstdint>
 #include "DataValue.h"
 
 
@@ -18,8 +19,8 @@ public:
 
 	virtual ~DataType() = default;
 
-	virtual std::vector<std::byte> serialize(const std::any& value) = 0;
-	virtual std::unique_ptr<DataValue> deserialize(const std::vector<std::byte>& data, size_t& offset) = 0;
+	virtual std::vector<uint8_t> serialize(const std::any& value) = 0;
+	virtual std::unique_ptr<DataValue> deserialize(const std::vector<uint8_t>& data, size_t& offset) = 0;
 
 	const Type getTypeName() const { return type; }
 	bool getIsFixedSize() const { return isFixedSize; }
@@ -29,13 +30,13 @@ public:
 class IntType : public DataType {
 public:
 	IntType() : DataType(Type::Number, true, sizeof(int)) {}
-	std::vector<std::byte> serialize(const std::any& value) override;
-	std::unique_ptr<DataValue> deserialize(const std::vector<std::byte>& data, size_t& offset) override;
+	std::vector<uint8_t> serialize(const std::any& value) override;
+	std::unique_ptr<DataValue> deserialize(const std::vector<uint8_t>& data, size_t& offset) override;
 };
 
 class StringType : public DataType {
 public:
 	StringType() : DataType(Type::Varchar, true, 255) {}
-	std::vector<std::byte> serialize(const std::any& value) override;
-	std::unique_ptr<DataValue> deserialize(const std::vector<std::byte>& data, size_t& offset) override;
+	std::vector<uint8_t> serialize(const std::any& value) override;
+	std::unique_ptr<DataValue> deserialize(const std::vector<uint8_t>& data, size_t& offset) override;
 };

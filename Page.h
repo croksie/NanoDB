@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <cstdint>
 #include "Tuple.h"
 
 constexpr auto PAGE_SIZE = 4096;
@@ -9,7 +10,7 @@ class Page
 {
 private:
 	std::vector<int> slotDirectory;
-	std::vector<std::byte> data;
+	std::vector<uint8_t> data;
 
 public:
 	int pageId = 0;
@@ -18,13 +19,13 @@ public:
 	int slotCount = 0;
 
 	Page();
-	Page(std::vector<std::byte> data);
+	Page(std::vector<uint8_t> data);
 	Page(int pageId, int prevPageId);
 
-	std::vector<std::byte> serialize() const;
+	std::vector<uint8_t> serialize() const;
 
 	void insertTuple(Tuple& tuple);
-	std::vector<std::byte> getTuple(int slotIndex) const;
+	std::vector<uint8_t> getTuple(int slotIndex) const;
 	int calculateNextTupleOffset() const;
 
 };
