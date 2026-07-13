@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <any>
+#include <cstdint>
 
 
 class DataType {
@@ -17,8 +18,8 @@ public:
 
 	virtual ~DataType() = default;
 
-	virtual std::vector<std::byte> serialize(const std::any& value) = 0;
-	virtual std::any deserialize(const std::vector<std::byte>& data) = 0;
+	virtual std::vector<uint8_t> serialize(const std::any& value) = 0;
+	virtual std::any deserialize(const std::vector<uint8_t>& data) = 0;
 
 	const std::string& getTypeName() const { return typeName; }
 	bool getIsFixedSize() const { return isFixedSize; }
@@ -28,13 +29,13 @@ public:
 class IntType : public DataType {
 public:
 	IntType() : DataType("Int", true, sizeof(int)) {}
-	std::vector<std::byte> serialize(const std::any& value) override;
-	std::any deserialize(const std::vector<std::byte>& data) override;
+	std::vector<uint8_t> serialize(const std::any& value) override;
+	std::any deserialize(const std::vector<uint8_t>& data) override;
 };
 
 class StringType : public DataType {
 public:
 	StringType() : DataType("String", true, 255) {}
-	std::vector<std::byte> serialize(const std::any& value) override;
-	std::any deserialize(const std::vector<std::byte>& data) override;
+	std::vector<uint8_t> serialize(const std::any& value) override;
+	std::any deserialize(const std::vector<uint8_t>& data) override;
 };

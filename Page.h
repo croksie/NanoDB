@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <cstdint>
 
 
 class Page
@@ -8,7 +9,7 @@ private:
 	int nextPageId;
 
 	std::vector<int> slotDirectory;
-	std::vector<std::byte> data;
+	std::vector<uint8_t> data;
 
 public:
 	const int pageId= 0;
