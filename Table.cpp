@@ -15,14 +15,14 @@ std::string Table::getName() const {
 
 
 void Table::insertTuple(std::vector<std::unique_ptr<DataValue>> data) {
-	std::vector<std::byte> result;
+	std::vector<uint8_t> result;
 	for (auto i = 0; i < this->columns.size(); i++) {
 		Column c = this->columns.at(i);
 		if (c.getDataType()->getTypeName() != data.at(i)->type) {
 			throw new DatabaseException("Le type ne conrrespond pas à la structure de la table");
 		}
 		else {
-			std::vector<std::byte> tmp = c.getDataType()->serialize(data.at(i)->getValue());
+			std::vector<uint8_t> tmp = c.getDataType()->serialize(data.at(i)->getValue());
 			result.insert(result.end(), tmp.begin(), tmp.end());
 		}
 	}
@@ -46,7 +46,7 @@ void Table::insertTupleIntoPage(Tuple& tuple)
 
 Tuple Table::createTuple(int slotIndex)
 {
-	std::vector<std::byte> data = this->loadedPage.getTuple(slotIndex);
+	std::vector<uint8_t> data = this->loadedPage.getTuple(slotIndex);
 
 	return Tuple(data);
 }
@@ -55,7 +55,7 @@ Tuple Table::createTuple(int slotIndex)
 void Table::displayTable()
 {
 	for (int i = 0; i < this->loadedPage.slotCount; ++i) {
-		std::vector<std::byte> tuple = this->loadedPage.getTuple(i);
+		std::vector<uint8_t> tuple = this->loadedPage.getTuple(i);
 
 		size_t offset = 0;
 		for (auto i = 0; i < this->columns.size(); i++) {

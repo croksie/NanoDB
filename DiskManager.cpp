@@ -41,7 +41,7 @@ Page DiskManager::readPage(int pageId)
     int offset = pageId * PAGE_SIZE;
     dbFile.seekg(offset, std::ios::beg);
 
-    std::vector<std::byte> buffer(PAGE_SIZE);
+    std::vector<uint8_t> buffer(PAGE_SIZE);
     if (!dbFile.read(reinterpret_cast<char*>(buffer.data()), PAGE_SIZE)) {
         size_t bytesRead = dbFile.gcount();
         buffer.resize(bytesRead);

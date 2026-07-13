@@ -37,22 +37,22 @@ void Database::stats() {
 
 Table* Database::getTable(std::string name)
 {
-	for (Table& t : this->tables) {
-		if (t.getName() == name) {
-			return &t;
+	for (auto& t : this->tables) {
+		if (t->getName() == name) {
+			return t.get();
 		}
 	}
 	return nullptr;
 }
 
 void Database::createTable(std::string name, std::vector<Column> collumn) {
-	this->tables.emplace_back(name, collumn, this->bm);
+	this->tables.push_back(std::make_unique<Table>(name, collumn, this->bm));
 }
 
 void Database::deleteTable(std::string name) {
 
 	for (auto it = this->tables.begin(); it != this->tables.end();) {
-		if (it->getName() == name) {
+		if ((*it)->getName() == name) {
 			it = this->tables.erase(it);
 		}
 		else{

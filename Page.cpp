@@ -3,17 +3,17 @@
 
 
 Page::Page() {
-	this->data.assign(PAGE_SIZE, std::byte{ 0 });
+	this->data.assign(PAGE_SIZE, 0);
 }
 
 Page::Page(int pageId, int prevPageId)
 	: pageId(pageId), prevPageId(prevPageId) 
 {
-	this->data.assign(PAGE_SIZE, std::byte{ 0 });
+	this->data.assign(PAGE_SIZE, 0);
 }
 
-Page::Page(std::vector<std::byte> data){
-	this->data.assign(PAGE_SIZE, std::byte{ 0 });
+Page::Page(std::vector<uint8_t> data){
+	this->data.assign(PAGE_SIZE, 0);
 
 	this->pageId = (static_cast<uint32_t>(data.at(0)) << 24) |
 				   (static_cast<uint32_t>(data.at(1)) << 16) |
@@ -41,30 +41,30 @@ Page::Page(std::vector<std::byte> data){
 }
 
 
-std::vector<std::byte> Page::serialize() const
+std::vector<uint8_t> Page::serialize() const
 {
-	std::vector<std::byte> result;
-	result.assign(PAGE_SIZE, std::byte{ 0 });
+	std::vector<uint8_t> result;
+	result.assign(PAGE_SIZE, 0);
 
-	result.at(0) = static_cast<std::byte>(pageId >> 24);
-	result.at(1) = static_cast<std::byte>(pageId >> 16);
-	result.at(2) = static_cast<std::byte>(pageId >> 8);
-	result.at(3) = static_cast<std::byte>(pageId);
+	result.at(0) = static_cast<uint8_t>(pageId >> 24);
+	result.at(1) = static_cast<uint8_t>(pageId >> 16);
+	result.at(2) = static_cast<uint8_t>(pageId >> 8);
+	result.at(3) = static_cast<uint8_t>(pageId);
 
-	result.at(4) = static_cast<std::byte>(nextPageId >> 24);
-	result.at(5) = static_cast<std::byte>(nextPageId >> 16);
-	result.at(6) = static_cast<std::byte>(nextPageId >> 8);
-	result.at(7) = static_cast<std::byte>(nextPageId);
+	result.at(4) = static_cast<uint8_t>(nextPageId >> 24);
+	result.at(5) = static_cast<uint8_t>(nextPageId >> 16);
+	result.at(6) = static_cast<uint8_t>(nextPageId >> 8);
+	result.at(7) = static_cast<uint8_t>(nextPageId);
 
-	result.at(8) = static_cast<std::byte>(prevPageId >> 24);
-	result.at(9) = static_cast<std::byte>(prevPageId >> 16);
-	result.at(10) = static_cast<std::byte>(prevPageId >> 8);
-	result.at(11) = static_cast<std::byte>(prevPageId);
+	result.at(8) = static_cast<uint8_t>(prevPageId >> 24);
+	result.at(9) = static_cast<uint8_t>(prevPageId >> 16);
+	result.at(10) = static_cast<uint8_t>(prevPageId >> 8);
+	result.at(11) = static_cast<uint8_t>(prevPageId);
 
-	result.at(12) = static_cast<std::byte>(slotCount >> 24);
-	result.at(13) = static_cast<std::byte>(slotCount >> 16);
-	result.at(14) = static_cast<std::byte>(slotCount >> 8);
-	result.at(15) = static_cast<std::byte>(slotCount);
+	result.at(12) = static_cast<uint8_t>(slotCount >> 24);
+	result.at(13) = static_cast<uint8_t>(slotCount >> 16);
+	result.at(14) = static_cast<uint8_t>(slotCount >> 8);
+	result.at(15) = static_cast<uint8_t>(slotCount);
 
 	for (int i = HEADER_SIZE; i < PAGE_SIZE; ++i) {
 		result.at(i) = this->data.at(i);
@@ -93,7 +93,7 @@ int Page::calculateNextTupleOffset() const
 
 void Page::insertTuple(Tuple& tuple)
 {
-	std::vector<std::byte> tupleData = tuple.data;
+	std::vector<uint8_t> tupleData = tuple.data;
 
 	size_t size = tupleData.size();
 
@@ -109,10 +109,10 @@ void Page::insertTuple(Tuple& tuple)
 
 	uint16_t tupleSize = static_cast<uint16_t>(size);
 	uint16_t tupleOffset = static_cast<uint16_t>(nextTupleOffset);
-	this->data.at(nextSlot) = static_cast<std::byte>(tupleOffset >> 8);
-	this->data.at(nextSlot + 1) = static_cast<std::byte>(tupleOffset & 0xFF);
-	this->data.at(nextSlot + 2) = static_cast<std::byte>(tupleSize >> 8);
-	this->data.at(nextSlot + 3) = static_cast<std::byte>(tupleSize & 0xFF);
+	this->data.at(nextSlot) = static_cast<uint8_t>(tupleOffset >> 8);
+	this->data.at(nextSlot + 1) = static_cast<uint8_t>(tupleOffset & 0xFF);
+	this->data.at(nextSlot + 2) = static_cast<uint8_t>(tupleSize >> 8);
+	this->data.at(nextSlot + 3) = static_cast<uint8_t>(tupleSize & 0xFF);
 
 	for (int i = 0; i < size; ++i) {
 		this->data.at(i + tupleStart) = tuple.data.at(i);
@@ -121,7 +121,7 @@ void Page::insertTuple(Tuple& tuple)
 	this->slotCount++;
 }
 
-std::vector<std::byte> Page::getTuple(int slotIndex) const
+std::vector<uint8_t> Page::getTuple(int slotIndex) const
 {
 	size_t slotOffset = HEADER_SIZE + static_cast<size_t>(slotIndex * 4);
 	uint16_t tupleOffset = (static_cast<uint16_t>(this->data.at(slotOffset)) << 8) |
@@ -129,8 +129,8 @@ std::vector<std::byte> Page::getTuple(int slotIndex) const
 	uint16_t tupleSize = (static_cast<uint16_t>(this->data.at(slotOffset + 2)) << 8) |
 		static_cast<uint16_t>(this->data.at(slotOffset + 3));
 
-	std::vector<std::byte> result;
-	result.assign( tupleSize, std::byte{ 0 });
+	std::vector<uint8_t> result;
+	result.assign( tupleSize, 0);
 
 	uint16_t tupleStart = tupleOffset - tupleSize;
 	for (int i = 0; i < tupleSize; ++i) {
@@ -138,5 +138,3 @@ std::vector<std::byte> Page::getTuple(int slotIndex) const
 	}
 	return result;
 }
-
-

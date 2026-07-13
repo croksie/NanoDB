@@ -21,6 +21,6 @@ public:
 	void createTable(std::string name, std::vector<Column> collumn);
 	void deleteTable(std::string name);
 private:
-	std::vector<Table> tables;
+	std::vector<std::unique_ptr<Table>> tables;
 };
 
