@@ -26,7 +26,7 @@ public:
 
 	void insertTuple(Tuple& tuple);
 	std::vector<uint8_t> getTuple(int slotIndex) const;
-	int calculateNextTupleOffset() const;
+	size_t calculateNextTupleOffset() const;
 
 };
 

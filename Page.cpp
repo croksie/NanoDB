@@ -35,7 +35,7 @@ Page::Page(std::vector<uint8_t> data){
 					  (static_cast<uint32_t>(data.at(14)) << 8) |
 					   static_cast<uint32_t>(data.at(15));
 
-	for (int i = HEADER_SIZE; i < PAGE_SIZE; ++i) {
+	for (size_t i = HEADER_SIZE; i < PAGE_SIZE; ++i) {
 		this->data.at(i) = data.at(i);
 	}
 }
@@ -66,7 +66,7 @@ std::vector<uint8_t> Page::serialize() const
 	result.at(14) = static_cast<uint8_t>(slotCount >> 8);
 	result.at(15) = static_cast<uint8_t>(slotCount);
 
-	for (int i = HEADER_SIZE; i < PAGE_SIZE; ++i) {
+	for (size_t i = HEADER_SIZE; i < PAGE_SIZE; ++i) {
 		result.at(i) = this->data.at(i);
 	}
 
@@ -76,18 +76,18 @@ std::vector<uint8_t> Page::serialize() const
 
 
 
-int Page::calculateNextTupleOffset() const
+size_t Page::calculateNextTupleOffset() const
 {
 	if (slotCount == 0) {
 		return PAGE_SIZE - 1;
 	}
 	else {
-		int lastSlotOffset = HEADER_SIZE + (this->slotCount - 1) * 4;
+		size_t lastSlotOffset = HEADER_SIZE + static_cast<size_t>(this->slotCount - 1) * 4;
 		uint16_t lastTupleOffset = (static_cast<uint16_t>(this->data.at(lastSlotOffset)) << 8) |
 			static_cast<uint16_t>(this->data.at(lastSlotOffset + 1));
 		uint16_t lastTupleSize = (static_cast<uint16_t>(this->data.at(lastSlotOffset + 2)) << 8) |
 			static_cast<uint16_t>(this->data.at(lastSlotOffset + 3));
-		return lastTupleOffset - lastTupleSize;
+		return static_cast<size_t>(lastTupleOffset) - lastTupleSize;
 	}
 }
 
@@ -100,8 +100,8 @@ void Page::insertTuple(Tuple& tuple)
 	// Réserver les 16 premiers octets pour l'entête donc début = tupleData.at(15)
 
 	// Représentation des slots : 2 octes pour index + 2 octets pour la taille
-	int nextSlot = HEADER_SIZE + (this->slotCount * 4); // number of slots * size of a slot + header size
-	int nextTupleOffset = this->calculateNextTupleOffset();
+	size_t nextSlot = HEADER_SIZE + (static_cast<size_t>(this->slotCount) * 4); // number of slots * size of a slot + header size
+	size_t nextTupleOffset = this->calculateNextTupleOffset();
 	size_t tupleStart = nextTupleOffset - size;
 	if (nextTupleOffset - size < nextSlot + 4) {
 		throw DatabaseException("la page est pleine");
@@ -114,7 +114,7 @@ void Page::insertTuple(Tuple& tuple)
 	this->data.at(nextSlot + 2) = static_cast<uint8_t>(tupleSize >> 8);
 	this->data.at(nextSlot + 3) = static_cast<uint8_t>(tupleSize & 0xFF);
 
-	for (int i = 0; i < size; ++i) {
+	for (size_t i = 0; i < size; ++i) {
 		this->data.at(i + tupleStart) = tuple.data.at(i);
 	}
 
@@ -123,18 +123,18 @@ void Page::insertTuple(Tuple& tuple)
 
 std::vector<uint8_t> Page::getTuple(int slotIndex) const
 {
-	size_t slotOffset = HEADER_SIZE + static_cast<size_t>(slotIndex * 4);
+	size_t slotOffset = HEADER_SIZE + static_cast<size_t>(slotIndex) * 4;
 	uint16_t tupleOffset = (static_cast<uint16_t>(this->data.at(slotOffset)) << 8) |
 		static_cast<uint16_t>(this->data.at(slotOffset + 1));
 	uint16_t tupleSize = (static_cast<uint16_t>(this->data.at(slotOffset + 2)) << 8) |
 		static_cast<uint16_t>(this->data.at(slotOffset + 3));
 
 	std::vector<uint8_t> result;
-	result.assign( tupleSize, 0);
+	result.assign(tupleSize, 0);
 
-	uint16_t tupleStart = tupleOffset - tupleSize;
-	for (int i = 0; i < tupleSize; ++i) {
-		result.at(i) = this->data.at(static_cast<size_t>(tupleStart + i));
+	size_t tupleStart = static_cast<size_t>(tupleOffset) - tupleSize;
+	for (size_t i = 0; i < tupleSize; ++i) {
+		result.at(i) = this->data.at(tupleStart + i);
 	}
 	return result;
 }

@@ -13,12 +13,13 @@ Page& BufferManager::getPage(int pageId)
 		if (this->bufferPool.size() > MAX_LAODED_PAGE) {
 			int bestCandidate = 0;
 			double bestCandidateScore = 0.0;
-			for (int i = 0; i < this->bufferPool.size(); ++i) {
-				uint64_t age = (globalClock - this->lastUse[i]);
-				double freqPenalty = 1.0 / (1.0 + this->numberOfUseSinceLoaded[i]);
-				if (bestCandidate < (age * freqPenalty)) {
-					bestCandidate = i;
-					bestCandidateScore = (age * freqPenalty);
+			for (size_t i = 0; i < this->bufferPool.size(); ++i) {
+				uint64_t age = (globalClock - this->lastUse[static_cast<int>(i)]);
+				double freqPenalty = 1.0 / (1.0 + this->numberOfUseSinceLoaded[static_cast<int>(i)]);
+				double score = static_cast<double>(age) * freqPenalty;
+				if (bestCandidateScore < score) {
+					bestCandidate = static_cast<int>(i);
+					bestCandidateScore = score;
 				}
 			}
 			this->flushPage(bestCandidate);

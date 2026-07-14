@@ -12,7 +12,7 @@ void DiskManager::writePage(Page& page)
             throw DatabaseException("Impossible d'ouvrir le fichier");
         }
     }
-    size_t offset = page.pageId * PAGE_SIZE;
+    size_t offset = static_cast<size_t>(page.pageId) * PAGE_SIZE;
     dbFile.seekp(offset, std::ios::beg);
 
     dbFile.seekp(0, std::ios::end);
@@ -38,7 +38,7 @@ Page DiskManager::readPage(int pageId)
         throw std::runtime_error("Impossible d'ouvrir le fichier");
     }
 
-    int offset = pageId * PAGE_SIZE;
+    size_t offset = static_cast<size_t>(pageId) * PAGE_SIZE;
     dbFile.seekg(offset, std::ios::beg);
 
     std::vector<uint8_t> buffer(PAGE_SIZE);

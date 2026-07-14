@@ -16,7 +16,7 @@ std::string Table::getName() const {
 
 void Table::insertTuple(std::vector<std::unique_ptr<DataValue>> data) {
 	std::vector<uint8_t> result;
-	for (auto i = 0; i < this->columns.size(); i++) {
+	for (size_t i = 0; i < this->columns.size(); i++) {
 		Column c = this->columns.at(i);
 		if (c.getDataType()->getTypeName() != data.at(i)->type) {
 			throw new DatabaseException("Le type ne conrrespond pas à la structure de la table");
@@ -58,7 +58,7 @@ void Table::displayTable()
 		std::vector<uint8_t> tuple = this->loadedPage.getTuple(i);
 
 		size_t offset = 0;
-		for (auto i = 0; i < this->columns.size(); i++) {
+		for (size_t i = 0; i < this->columns.size(); i++) {
 			Column c = this->columns.at(i);
 			std::unique_ptr<DataValue> valuePtr = c.getDataType()->deserialize(tuple, offset);
 			std::cout << valuePtr->toString() << " ";

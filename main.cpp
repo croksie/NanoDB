@@ -23,11 +23,11 @@ int main() {
 
     Table* utilisateur = db.getTable("Utilisateurs");
 
-   /* utilisateur->insertTuple(row(std::make_unique<IntValue>(1), std::make_unique<StringValue>("John"), std::make_unique<IntValue>(20)));
+    utilisateur->insertTuple(row(std::make_unique<IntValue>(1), std::make_unique<StringValue>("John"), std::make_unique<IntValue>(20)));
     utilisateur->insertTuple(row(std::make_unique<IntValue>(2), std::make_unique<StringValue>("Simon"), std::make_unique<IntValue>(10)));
-    utilisateur->insertTuple(row(std::make_unique<IntValue>(3), std::make_unique<StringValue>("Martin"), std::make_unique<IntValue>(55)));*/
+    utilisateur->insertTuple(row(std::make_unique<IntValue>(3), std::make_unique<StringValue>("Martin"), std::make_unique<IntValue>(55)));
 
-    //utilisateur->displayTable();
+    utilisateur->displayTable();
 
     db.stats();
 
