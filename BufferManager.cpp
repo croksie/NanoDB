@@ -45,10 +45,10 @@ void BufferManager::flushPage(int pageId)
 
 void BufferManager::saveNewPage(std::shared_ptr<Page> page)
 {
-	std::shared_ptr<Page> prevPage = this->getPage(page->prevPageId);
-	prevPage->nextPageId = page->pageId;
+	//std::shared_ptr<Page> prevPage = this->getPage(page->prevPageId);
+	//prevPage->nextPageId = page->pageId;
 	this->dm.writePage(page);
-	this->flushPage(prevPage->pageId);
+	//this->flushPage(prevPage->pageId);
 }
 
 int BufferManager::allocatePage()

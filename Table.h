@@ -21,6 +21,7 @@ private:
 
 public:
 	Table(std::string name, std::vector<Column> column, BufferManager& bm);
+	// TODO : Ajout d'un constructeur pour crée une table déjà existante avec un tableau d'octets
 
 
 	std::string getName() const;
