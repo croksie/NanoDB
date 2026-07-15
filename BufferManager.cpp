@@ -1,6 +1,6 @@
 #include "BufferManager.h"
 
-Page& BufferManager::getPage(int pageId)
+std::shared_ptr<Page> BufferManager::getPage(int pageId)
 {
 	this->globalClock++;
 	auto it = this->bufferPool.find(pageId);
@@ -24,7 +24,7 @@ Page& BufferManager::getPage(int pageId)
 			}
 			this->flushPage(bestCandidate);
 		}
-		Page p = this->dm.readPage(pageId);
+		std::shared_ptr<Page> p = this->dm.readPage(pageId);
 		this->bufferPool[pageId] = p;
 		this->numberOfUseSinceLoaded[pageId] = 1;
 		this->lastUse[pageId] = this->globalClock;
@@ -43,12 +43,12 @@ void BufferManager::flushPage(int pageId)
 	}
 }
 
-void BufferManager::saveNewPage(Page& page)
+void BufferManager::saveNewPage(std::shared_ptr<Page> page)
 {
-	Page& prevPage = this->getPage(page.prevPageId);
-	prevPage.nextPageId = page.pageId;
+	std::shared_ptr<Page> prevPage = this->getPage(page->prevPageId);
+	prevPage->nextPageId = page->pageId;
 	this->dm.writePage(page);
-	this->flushPage(prevPage.pageId);
+	this->flushPage(prevPage->pageId);
 }
 
 int BufferManager::allocatePage()

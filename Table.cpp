@@ -6,7 +6,7 @@
 Table::Table(std::string name, std::vector<Column> column, BufferManager& bm) : columns(column), name(name), bm(bm), loadedPage(bm.getPage(0)){
 	//Page p = Page();
 	//dm.writePage(p);
-	this->loadedPage = bm.getPage(0);
+	//this->loadedPage = bm.getPage(0);
 }
 
 std::string Table::getName() const {
@@ -35,7 +35,7 @@ void Table::insertTupleIntoPage(Tuple& tuple)
 {
 	try
 	{
-		this->loadedPage.insertTuple(tuple);
+		this->loadedPage->insertTuple(tuple);
 	}
 	catch (const DatabaseException&)
 	{
@@ -46,7 +46,7 @@ void Table::insertTupleIntoPage(Tuple& tuple)
 
 Tuple Table::createTuple(int slotIndex)
 {
-	std::vector<uint8_t> data = this->loadedPage.getTuple(slotIndex);
+	std::vector<uint8_t> data = this->loadedPage->getTuple(slotIndex);
 
 	return Tuple(data);
 }
@@ -54,8 +54,8 @@ Tuple Table::createTuple(int slotIndex)
 
 void Table::displayTable()
 {
-	for (int i = 0; i < this->loadedPage.slotCount; ++i) {
-		std::vector<uint8_t> tuple = this->loadedPage.getTuple(i);
+	for (int i = 0; i < this->loadedPage->slotCount; ++i) {
+		std::vector<uint8_t> tuple = this->loadedPage->getTuple(i);
 
 		size_t offset = 0;
 		for (size_t i = 0; i < this->columns.size(); i++) {
@@ -69,21 +69,21 @@ void Table::displayTable()
 
 void Table::nextPage()
 {
-	int pageId = this->loadedPage.nextPageId;
+	int pageId = this->loadedPage->nextPageId;
 	if (pageId == 0) {
 		int newPageId = this->bm.allocatePage();
-		Page newPage = Page(newPageId, this->loadedPage.pageId);
+		std::shared_ptr<Page> newPage = std::make_shared<Page>(newPageId, this->loadedPage->pageId);
 		this->bm.saveNewPage(newPage);
 	}
-	this->bm.flushPage(this->loadedPage.pageId);
+	this->bm.flushPage(this->loadedPage->pageId);
 	this->loadedPage = this->bm.getPage(pageId);
 }
 
 void Table::prevPage()
 {
-	int pageId = this->loadedPage.prevPageId;
+	int pageId = this->loadedPage->prevPageId;
 	if (pageId != 0) {
-		this->bm.flushPage(this->loadedPage.pageId);
+		this->bm.flushPage(this->loadedPage->pageId);
 		this->loadedPage = this->bm.getPage(pageId);
 	}
 }

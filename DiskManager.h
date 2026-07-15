@@ -1,10 +1,11 @@
 #pragma once
+#include <memory>
 #include "Page.h"
 class DiskManager
 {
 public:
-	void writePage(Page& page);
+	void writePage(std::shared_ptr<Page> page);
 
-	Page readPage(int pageId);
+	std::shared_ptr<Page> readPage(int pageId);
 };
 

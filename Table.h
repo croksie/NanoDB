@@ -15,7 +15,7 @@ private:
 	std::string name;
 	std::vector<Column> columns;
 
-	Page& loadedPage;
+	std::shared_ptr<Page> loadedPage;
 
 	BufferManager& bm;
 

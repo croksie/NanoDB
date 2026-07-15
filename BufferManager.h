@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <memory>
 #include "DiskManager.h"
 #include "Page.h" 
 
@@ -10,7 +11,7 @@ class BufferManager {
 
 	uint64_t globalClock = 0;
 
-	std::unordered_map<int, Page> bufferPool;
+	std::unordered_map<int, std::shared_ptr<Page>> bufferPool;
 	std::unordered_map<int, uint64_t> numberOfUseSinceLoaded;
 	std::unordered_map<int, uint64_t> lastUse;
 
@@ -18,9 +19,9 @@ class BufferManager {
 
 
 public:
-	Page& getPage(int pageId);
+	std::shared_ptr<Page> getPage(int pageId);
 	void flushPage(int pageId);
-	void saveNewPage(Page& page);
+	void saveNewPage(std::shared_ptr<Page> page);
 
 
 	int allocatePage();

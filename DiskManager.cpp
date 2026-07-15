@@ -2,7 +2,7 @@
 #include <fstream>
 #include "DatabaseException.h"
 
-void DiskManager::writePage(Page& page)
+void DiskManager::writePage(std::shared_ptr<Page> page)
 {
 	std::ofstream dbFile("data.db", std::ios::binary);
 
@@ -12,7 +12,7 @@ void DiskManager::writePage(Page& page)
             throw DatabaseException("Impossible d'ouvrir le fichier");
         }
     }
-    size_t offset = static_cast<size_t>(page.pageId) * PAGE_SIZE;
+    size_t offset = static_cast<size_t>(page->pageId) * PAGE_SIZE;
     dbFile.seekp(offset, std::ios::beg);
 
     dbFile.seekp(0, std::ios::end);
@@ -24,14 +24,14 @@ void DiskManager::writePage(Page& page)
 
     dbFile.seekp(offset, std::ios::beg);
 
-    dbFile.write(reinterpret_cast<const char*>(page.serialize().data()), 4096);
+    dbFile.write(reinterpret_cast<const char*>(page->serialize().data()), 4096);
 
     if (!dbFile.good()) {
         throw DatabaseException("Impossible d'ouvrir le fichier");
     }
 }
 
-Page DiskManager::readPage(int pageId)
+std::shared_ptr<Page> DiskManager::readPage(int pageId)
 {
     std::ifstream dbFile("data.db", std::ios::binary);
     if (!dbFile.is_open()) {
@@ -46,5 +46,5 @@ Page DiskManager::readPage(int pageId)
         size_t bytesRead = dbFile.gcount();
         buffer.resize(bytesRead);
     }
-	return Page(buffer);
+	return std::make_shared<Page>(buffer);
 }
