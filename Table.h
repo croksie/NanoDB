@@ -11,7 +11,7 @@
 class Table
 {
 private:
-	//int firstPageIndex = 0;
+	int firstPageIndex = 0;
 	std::string name;
 	std::vector<Column> columns;
 
@@ -21,8 +21,9 @@ private:
 
 public:
 	Table(std::string name, std::vector<Column> column, BufferManager& bm);
-	// TODO : Ajout d'un constructeur pour crée une table déjà existante avec un tableau d'octets
+	Table(std::vector<uint8_t> data, BufferManager& bm);
 
+	std::vector<uint8_t> serialize();
 
 	std::string getName() const;
 
