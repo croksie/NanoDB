@@ -4,30 +4,35 @@
 
 void DiskManager::writePage(std::shared_ptr<Page> page)
 {
-	std::ofstream dbFile("data.db", std::ios::binary);
+    // use std::fstream because std::ofstream truncates.
+    std::fstream dbFile("data.db", std::ios::in | std::ios::out | std::ios::binary);
 
-    if (!dbFile.is_open()) {
-        dbFile.open("data.db", std::ios::binary | std::ios::out);
+    if (!dbFile.is_open()) { // if file not exist
+        std::ofstream create_file("data.db", std::ios::binary);
+        create_file.close();
+
+        dbFile.open("data.db", std::ios::in | std::ios::out | std::ios::binary);
         if (!dbFile.is_open()) {
-            throw DatabaseException("Impossible d'ouvrir le fichier");
+            throw DatabaseException("Impossible d'ouvrir le fichier data.db");
         }
     }
-    size_t offset = static_cast<size_t>(page->pageId) * PAGE_SIZE;
-    dbFile.seekp(offset, std::ios::beg);
 
+    size_t offset = static_cast<size_t>(page->pageId) * PAGE_SIZE;
+
+    // check if we need padding
     dbFile.seekp(0, std::ios::end);
     size_t fileSize = dbFile.tellp();
-    if (offset + 4096 > fileSize) {
+    if (offset + PAGE_SIZE > fileSize) {
         dbFile.seekp(0, std::ios::end);
-        dbFile.write("\0", offset + PAGE_SIZE - fileSize);
+        std::vector<char> padding(offset + PAGE_SIZE - fileSize, 0);
+        dbFile.write(padding.data(), padding.size());
     }
 
     dbFile.seekp(offset, std::ios::beg);
-
-    dbFile.write(reinterpret_cast<const char*>(page->serialize().data()), 4096);
+    dbFile.write(reinterpret_cast<const char*>(page->serialize().data()), PAGE_SIZE);
 
     if (!dbFile.good()) {
-        throw DatabaseException("Impossible d'ouvrir le fichier");
+        throw DatabaseException("Erreur lors de l'ecriture de la page");
     }
 }
 
@@ -35,16 +40,16 @@ std::shared_ptr<Page> DiskManager::readPage(int pageId)
 {
     std::ifstream dbFile("data.db", std::ios::binary);
     if (!dbFile.is_open()) {
-        throw std::runtime_error("Impossible d'ouvrir le fichier");
+        throw DatabaseException("Impossible d'ouvrir le fichier pour lecture");
     }
 
     size_t offset = static_cast<size_t>(pageId) * PAGE_SIZE;
     dbFile.seekg(offset, std::ios::beg);
 
     std::vector<uint8_t> buffer(PAGE_SIZE);
-    if (!dbFile.read(reinterpret_cast<char*>(buffer.data()), PAGE_SIZE)) {
-        size_t bytesRead = dbFile.gcount();
-        buffer.resize(bytesRead);
+    dbFile.read(reinterpret_cast<char*>(buffer.data()), PAGE_SIZE);
+    if (dbFile.gcount() < PAGE_SIZE) {
+        throw DatabaseException("La page n'existe pas");
     }
-	return std::make_shared<Page>(buffer);
+    return std::make_shared<Page>(buffer);
 }
