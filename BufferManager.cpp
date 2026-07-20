@@ -69,11 +69,6 @@ void BufferManager::flushAll()
 
 void BufferManager::saveNewPage(std::shared_ptr<Page> page)
 {
-	if (page->pageId != 0) {
-		std::shared_ptr<Page> prevPage = this->getPage(page->prevPageId);
-		prevPage->nextPageId = page->pageId;
-		this->dm.writePage(prevPage);
-	}
 	this->dm.writePage(page);
 }
 

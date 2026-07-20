@@ -72,7 +72,7 @@ std::vector<Tuple> Table::searchTuple(std::vector<std::string> cols, std::vector
 		for (int i = 0; i < this->loadedPage->slotCount; ++i) {
 			Tuple tuple = Tuple(this->loadedPage->getTuple(i));
 			std::vector<std::shared_ptr<DataValue>> values = tuple.deserialize(this->columns);
-			int numberOfValue = cols.size();
+			size_t numberOfValue = cols.size();
 			for (int i = 0; i < this->columns.size(); ++i) {
 				for (int j = 0; j < cols.size(); ++j) {
 					if (this->columns.at(i).getName() == cols.at(j)) {
@@ -121,6 +121,7 @@ void Table::nextPage()
 		std::shared_ptr<Page> newPage = std::make_shared<Page>(newPageId, this->loadedPage->pageId);
 		this->loadedPage->nextPageId = newPageId;
 		this->bm.saveNewPage(newPage);
+		nextPageId = newPageId;
 	}
 	this->bm.flushPage(this->loadedPage->pageId);
 	this->loadedPage = this->bm.getPage(nextPageId);
