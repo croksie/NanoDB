@@ -11,7 +11,7 @@
 class Table
 {
 private:
-	//int firstPageIndex = 0;
+	int firstPageIndex = 0;
 	std::string name;
 	std::vector<Column> columns;
 
@@ -20,15 +20,18 @@ private:
 	BufferManager& bm;
 
 public:
-	Table(std::string name, std::vector<Column> column, BufferManager& bm);
-	// TODO : Ajout d'un constructeur pour crée une table déjà existante avec un tableau d'octets
+	Table(std::string name, std::vector<Column> column, int firstPageIndex, BufferManager& bm);
 
 
 	std::string getName() const;
+	const std::vector<Column>& getColumns() const { return this->columns; }
 
 	void insertTuple(std::vector<std::unique_ptr<DataValue>> data);
 	void insertTupleIntoPage(Tuple& tuple);
 	Tuple createTuple(int slotIndex);
+
+	std::vector<Tuple> getTuples();
+	std::vector<Tuple> searchTuple(std::vector<std::string> cols, std::vector<std::shared_ptr<DataValue>> datas);
 
 	void displayTable();
 	// TODO : Crée une fonction qui renvoie le premier espaces libres en prenant la taille de l'espace en paramètre

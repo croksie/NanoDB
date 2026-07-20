@@ -2,12 +2,16 @@
 #include "DatabaseException.h"
 
 
-
-Table::Table(std::string name, std::vector<Column> column, BufferManager& bm) : columns(column), name(name), bm(bm) {
-	int newPageId = this->bm.allocatePage();
-	std::shared_ptr<Page> newPage = std::make_shared<Page>(newPageId, 0);
-	this->bm.saveNewPage(newPage);
-	this->loadedPage = this->bm.getPage(newPageId);
+Table::Table(std::string name, std::vector<Column> column, int firstPageIndex, BufferManager& bm) 
+	: columns(column), name(name), bm(bm), firstPageIndex(firstPageIndex) 
+{
+	try {
+		this->loadedPage = this->bm.getPage(firstPageIndex);
+	} catch (...) {
+		std::shared_ptr<Page> newPage = std::make_shared<Page>(firstPageIndex, 0);
+		this->bm.saveNewPage(newPage);
+		this->loadedPage = this->bm.getPage(firstPageIndex);
+	}
 }
 
 std::string Table::getName() const {
@@ -16,20 +20,8 @@ std::string Table::getName() const {
 
 
 void Table::insertTuple(std::vector<std::unique_ptr<DataValue>> data) {
-	std::vector<uint8_t> result;
-	for (size_t i = 0; i < this->columns.size(); i++) {
-		Column c = this->columns.at(i);
-		if (c.getDataType()->getTypeName() != data.at(i)->type) {
-			throw new DatabaseException("Le type ne conrrespond pas à la structure de la table");
-		}
-		else {
-			std::vector<uint8_t> tmp = c.getDataType()->serialize(data.at(i)->getValue());
-			result.insert(result.end(), tmp.begin(), tmp.end());
-		}
-	}
-	Tuple tuple = Tuple(result);
+	Tuple tuple = Tuple::serialize(data, this->columns);
 	insertTupleIntoPage(tuple);
-
 }
 
 void Table::insertTupleIntoPage(Tuple& tuple)
@@ -38,7 +30,7 @@ void Table::insertTupleIntoPage(Tuple& tuple)
 	{
 		this->loadedPage->insertTuple(tuple);
 	}
-	catch (const DatabaseException&)
+	catch (const DatabaseException&) // No more space un the current page
 	{
 		this->nextPage();
 		this->insertTupleIntoPage(tuple);
@@ -52,17 +44,66 @@ Tuple Table::createTuple(int slotIndex)
 	return Tuple(data);
 }
 
+std::vector<Tuple> Table::getTuples() {
+	this->loadedPage = this->bm.getPage(firstPageIndex);
+
+	std::vector<Tuple> result;
+	int nextPageId = 0;
+	do {
+		if (nextPageId != 0) this->nextPage();
+		for (int i = 0; i < this->loadedPage->slotCount; ++i) {
+			Tuple tuple = Tuple(this->loadedPage->getTuple(i));
+			result.push_back(tuple);
+		}
+		nextPageId = this->loadedPage->nextPageId;
+	} while (nextPageId != 0);
+
+	return result;
+}
+
+
+std::vector<Tuple> Table::searchTuple(std::vector<std::string> cols, std::vector<std::shared_ptr<DataValue>> datas) {
+	this->loadedPage = this->bm.getPage(firstPageIndex);
+
+	std::vector<Tuple> result;
+	int nextPageId = 0;
+	do {
+		if (nextPageId != 0) this->nextPage();
+		for (int i = 0; i < this->loadedPage->slotCount; ++i) {
+			Tuple tuple = Tuple(this->loadedPage->getTuple(i));
+			std::vector<std::shared_ptr<DataValue>> values = tuple.deserialize(this->columns);
+			int numberOfValue = cols.size();
+			for (int i = 0; i < this->columns.size(); ++i) {
+				for (int j = 0; j < cols.size(); ++j) {
+					if (this->columns.at(i).getName() == cols.at(j)) {
+						if ((*datas.at(j)).toString() == (*values.at(i)).toString()) {
+							numberOfValue -= 1;
+						}
+					}
+				}
+			}
+			if (numberOfValue == 0) {
+				result.push_back(tuple);
+			}
+		}
+		nextPageId = this->loadedPage->nextPageId;
+	} while (nextPageId != 0);
+
+	return result;
+}
 
 void Table::displayTable()
 {
-	int nextPageId;
+	this->loadedPage = this->bm.getPage(firstPageIndex);
+	int nextPageId = 0;
 	do {
+		if (nextPageId != 0) this->nextPage();
 		for (int i = 0; i < this->loadedPage->slotCount; ++i) {
 			std::vector<uint8_t> tuple = this->loadedPage->getTuple(i);
 
 			size_t offset = 0;
-			for (size_t i = 0; i < this->columns.size(); i++) {
-				Column c = this->columns.at(i);
+			for (size_t colIdx = 0; colIdx < this->columns.size(); colIdx++) {
+				Column c = this->columns.at(colIdx);
 				std::unique_ptr<DataValue> valuePtr = c.getDataType()->deserialize(tuple, offset);
 				std::cout << valuePtr->toString() << " ";
 			}
