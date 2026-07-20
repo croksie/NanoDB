@@ -1,4 +1,18 @@
 #include "BufferManager.h"
+#include <fstream>
+
+BufferManager::BufferManager() {
+	std::ifstream file("data.db", std::ios::binary | std::ios::ate);
+	if (file.is_open()) {
+		std::streampos size = file.tellg();
+		this->nextPageId = static_cast<int>(size / PAGE_SIZE);
+		if (this->nextPageId < 2) {
+			this->nextPageId = 2;
+		}
+	} else {
+		this->nextPageId = 2;
+	}
+}
 
 std::shared_ptr<Page> BufferManager::getPage(int pageId)
 {
@@ -43,12 +57,19 @@ void BufferManager::flushPage(int pageId)
 	}
 }
 
+void BufferManager::flushAll()
+{
+	for (auto const& [id, page] : this->bufferPool) {
+		this->dm.writePage(page);
+	}
+	this->bufferPool.clear();
+	this->numberOfUseSinceLoaded.clear();
+	this->lastUse.clear();
+}
+
 void BufferManager::saveNewPage(std::shared_ptr<Page> page)
 {
-	//std::shared_ptr<Page> prevPage = this->getPage(page->prevPageId);
-	//prevPage->nextPageId = page->pageId;
 	this->dm.writePage(page);
-	//this->flushPage(prevPage->pageId);
 }
 
 int BufferManager::allocatePage()

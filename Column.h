@@ -17,8 +17,10 @@ public:
 	Column(std::vector<uint8_t> data);
 
 	~Column() = default;
+
 	std::shared_ptr<DataType> getDataType() const { return this->data; }
+	std::string getName() const { return this->name; }
+	bool getIsNullable() const { return this->isNullable; }
 
 	std::vector<uint8_t> serialize();
 };
-

@@ -7,12 +7,12 @@
 #include "Table.h"
 
 
-
 class Database
 {
 public: 
 	BufferManager bm = BufferManager();
 
+	Database();
 	void clear();
 	void stats();
 
@@ -20,7 +20,12 @@ public:
 	Table* getTable(std::string name);
 	void createTable(std::string name, std::vector<Column> collumn);
 	void deleteTable(std::string name);
+
+	void saveTable(std::string name);
+	void loadTable(std::string name);
+
+	void loadSystemsTables();
 private:
-	std::vector<std::unique_ptr<Table>> tables;
+	std::unordered_map<std::string, std::unique_ptr<Table>> tables;
 };
 

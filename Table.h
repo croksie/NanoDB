@@ -20,16 +20,19 @@ private:
 	BufferManager& bm;
 
 public:
-	Table(std::string name, std::vector<Column> column, BufferManager& bm);
-	Table(std::vector<uint8_t> data, BufferManager& bm);
+	Table(std::string name, std::vector<Column> column, int firstPageIndex, BufferManager& bm);
 
 	std::vector<uint8_t> serialize();
 
 	std::string getName() const;
+	const std::vector<Column>& getColumns() const { return this->columns; }
 
 	void insertTuple(std::vector<std::unique_ptr<DataValue>> data);
 	void insertTupleIntoPage(Tuple& tuple);
 	Tuple createTuple(int slotIndex);
+
+	std::vector<Tuple> getTuples();
+	std::vector<Tuple> searchTuple(std::vector<std::string> cols, std::vector<std::shared_ptr<DataValue>> datas);
 
 	void displayTable();
 	// TODO : Crée une fonction qui renvoie le premier espaces libres en prenant la taille de l'espace en paramètre
