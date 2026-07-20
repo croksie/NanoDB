@@ -9,7 +9,6 @@ constexpr auto HEADER_SIZE = 16;
 class Page
 {
 private:
-	std::vector<int> slotDirectory;
 	std::vector<uint8_t> data;
 
 public:
