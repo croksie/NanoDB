@@ -15,6 +15,10 @@ class Column
 public:
 	Column(std::shared_ptr<DataType> dataType, std::string name) : data(dataType), name(name) {}
 	~Column() = default;
-	std::shared_ptr<DataType> getDataType() const { return this->data; }
-};
 
+	std::shared_ptr<DataType> getDataType() const { return this->data; }
+	std::string getName() const { return this->name; }
+	bool getIsNullable() const { return this->isNullable; }
+
+	std::vector<uint8_t> serialize();
+};
