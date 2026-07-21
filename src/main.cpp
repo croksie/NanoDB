@@ -3,13 +3,8 @@
 #include "Database.h"
 #include "DataType.h"
 #include "DatabaseException.h"
+#include "Utils.h"
 
-template <typename... Args>
-auto row(Args&&... args) {
-    std::vector<std::unique_ptr<DataValue>> r;
-    (r.push_back(std::move(args)), ...);
-    return r;
-}
 
 int main() {
     try {

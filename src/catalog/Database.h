@@ -5,6 +5,7 @@
 #include <vector>
 #include "BufferManager.h"
 #include "Table.h"
+#include "Utils.h"
 
 
 class Database

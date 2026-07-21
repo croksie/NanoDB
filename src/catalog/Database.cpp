@@ -32,12 +32,6 @@ Table* Database::getTable(std::string name)
 	}
 }
 
-template <typename... Args>
-auto row(Args&&... args) {
-	std::vector<std::unique_ptr<DataValue>> r;
-	(r.push_back(std::move(args)), ...);
-	return r;
-}
 
 void Database::createTable(std::string name, std::vector<Column> collumn) {
 	int firstPageIndex = this->bm.allocatePage();
