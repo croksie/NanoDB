@@ -14,6 +14,11 @@ BufferManager::BufferManager() {
 	}
 }
 
+BufferManager::~BufferManager()
+{
+	this->flushAll();
+}
+
 std::shared_ptr<Page> BufferManager::getPage(int pageId)
 {
 	this->globalClock++;

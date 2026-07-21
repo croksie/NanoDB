@@ -39,9 +39,6 @@ int main() {
 
         db.stats();
 
-        std::cout << "Sauvegarde (flush) des donnees sur disque..." << std::endl;
-        db.saveTable("Utilisateurs");
-
     } catch (const std::exception& e) {
         std::cerr << "Erreur standard capturee : " << e.what() << std::endl;
     } catch (...) {

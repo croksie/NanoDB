@@ -22,7 +22,6 @@ public:
 	void createTable(std::string name, std::vector<Column> collumn);
 	void deleteTable(std::string name);
 
-	void saveTable(std::string name);
 	void loadTable(std::string name);
 
 	void loadSystemsTables();

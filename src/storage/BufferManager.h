@@ -20,6 +20,7 @@ class BufferManager {
 
 public:
 	BufferManager();
+	~BufferManager();
 	std::shared_ptr<Page> getPage(int pageId);
 	void flushPage(int pageId);
 	void flushAll();

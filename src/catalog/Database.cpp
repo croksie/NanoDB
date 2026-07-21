@@ -55,9 +55,7 @@ void Database::deleteTable(std::string name) {
 	}
 }
 
-void Database::saveTable(std::string name) {
-	this->bm.flushAll();
-}
+
 
 
 
