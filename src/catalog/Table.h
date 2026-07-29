@@ -22,8 +22,6 @@ private:
 public:
 	Table(std::string name, std::vector<Column> column, int firstPageIndex, BufferManager& bm);
 
-	std::vector<uint8_t> serialize();
-
 	std::string getName() const;
 	const std::vector<Column>& getColumns() const { return this->columns; }
 
