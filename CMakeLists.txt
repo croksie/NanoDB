@@ -21,4 +21,6 @@ target_include_directories(NanoDB PRIVATE
     src/catalog
     src/types
     src/common
+    src/parser
+    src/executor
 )
