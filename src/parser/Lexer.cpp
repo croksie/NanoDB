@@ -60,12 +60,47 @@ std::vector<Token> Lexer::Analyse()
 			continue;
 		}
 		if (c == '>') {
-			tokens.emplace_back(Token(TokenType::GREATER, ">"));
+			if (this->input.at(this->current_pos + 1) == '=') {
+				tokens.emplace_back(Token(TokenType::GREATER_EQUAL, ">="));
+			}
+			else {
+				tokens.emplace_back(Token(TokenType::GREATER, ">"));
+			}
+			this->current_pos++;
+			continue;
+		}
+		if (c == '<') {
+			if (this->input.at(this->current_pos + 1) == '=') {
+				tokens.emplace_back(Token(TokenType::LESS_EQUAL, "<="));
+			}
+			else {
+				tokens.emplace_back(Token(TokenType::LESS, "<"));
+			}
+			this->current_pos++;
+			continue;
+		}
+		if (c == '!') {
+			if (this->input.at(this->current_pos + 1) == '=') {
+				tokens.emplace_back(Token(TokenType::NOT_EQUAL, "!="));
+			}
+			else {
+				tokens.emplace_back(Token(TokenType::NOT, "!"));
+			}
 			this->current_pos++;
 			continue;
 		}
 		if (c == '*') {
 			tokens.emplace_back(Token(TokenType::STAR, "*"));
+			this->current_pos++;
+			continue;
+		}
+		if (c == '(') {
+			tokens.emplace_back(Token(TokenType::LEFT_PARENTHESIS, "("));
+			this->current_pos++;
+			continue;
+		}
+		if (c == ')') {
+			tokens.emplace_back(Token(TokenType::RIGHT_PARENTHESIS, ")"));
 			this->current_pos++;
 			continue;
 		}
