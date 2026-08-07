@@ -36,6 +36,8 @@ std::unique_ptr<ASTNode> Parser::parseStatement()
 		case TokenType::KEYWORD_SELECT:
 			return this->parseSelect();
 			break;
+		case TokenType::KEYWORD_DROP:
+			return this->parseDropTable();
 		default:
 			throw DatabaseException("Expression non reconnue");
 			break;
@@ -65,6 +67,17 @@ std::unique_ptr<SelectStatement> Parser::parseSelect()
 	this->consume(TokenType::SEMICOLON, "Il manque le point virgule à la fin de la requête");
 
 
+	return std::move(result);
+}
+
+std::unique_ptr<DropTableStatement> Parser::parseDropTable()
+{
+	this->advance();
+	this->consume(TokenType::KEYWORD_TABLE, "Table attendue aprés DROP");
+	this->advance();
+	Token table = this->consume(TokenType::KEYWORD_TABLE, "Nom de la table attendue aprés DROP");
+	auto result = std::make_unique<DropTableStatement>();
+	result->tableName = table.value;
 	return std::move(result);
 }
 

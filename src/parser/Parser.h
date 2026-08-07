@@ -25,6 +25,7 @@ public:
 
 	std::unique_ptr<ASTNode>  parseStatement();
 	std::unique_ptr<SelectStatement> parseSelect();
+	std::unique_ptr<DropTableStatement> parseDropTable();
 	std::unique_ptr<TableRef>   parseTableRef();
 	std::unique_ptr<Expression> parseExpression();
 	std::unique_ptr<Expression> parseOr();
