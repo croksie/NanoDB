@@ -33,7 +33,7 @@ public:
 	std::vector<Tuple> searchTuple(std::vector<std::string> cols, std::vector<std::shared_ptr<DataValue>> datas);
 
 	void displayTable();
-	// TODO : Crée une fonction qui renvoie le premier espaces libres en prenant la taille de l'espace en paramètre
+	// TODO : Create a function that return the first free space by passing the size of the space in parameter
 	void nextPage();
 	void prevPage();
 };

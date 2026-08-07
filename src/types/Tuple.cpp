@@ -7,7 +7,7 @@ Tuple Tuple::serialize(const std::vector<std::unique_ptr<DataValue>>& values, co
     for (size_t i = 0; i < columns.size(); i++) {
         Column c = columns.at(i);
         if (c.getDataType()->getTypeName() != values.at(i)->type) {
-            throw DatabaseException("Types de donnee incompatibles lors de la serialisation");
+            throw DatabaseException("DataType not compatible during serialization");
         }
         std::vector<uint8_t> tmp = c.getDataType()->serialize(values.at(i)->getValue());
         result.insert(result.end(), tmp.begin(), tmp.end());

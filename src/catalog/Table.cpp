@@ -30,7 +30,7 @@ void Table::insertTupleIntoPage(Tuple& tuple)
 	{
 		this->loadedPage->insertTuple(tuple);
 	}
-	catch (const DatabaseException&) // No more space un the current page
+	catch (const DatabaseException&) // No more space in the current page
 	{
 		this->nextPage();
 		this->insertTupleIntoPage(tuple);

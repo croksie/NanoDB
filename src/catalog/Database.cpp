@@ -11,7 +11,7 @@ void Database::clear() {
 }
 
 void Database::stats() {
-	std::cout << "Il y a " << this->tables.size() << " tables dans la db." << std::endl;
+	std::cout << "There are " << this->tables.size() << " tables in the db." << std::endl;
 }
 
 Table* Database::getTable(std::string name)
@@ -77,7 +77,7 @@ void Database::loadTable(std::string name) {
     }
 
     if (tableFirstPageIndex == -1) {
-        throw DatabaseException("Table non trouvee dans le catalogue");
+        throw DatabaseException("Table not found in the database");
     }
 
 	// Retrieve columns
@@ -101,7 +101,7 @@ void Database::loadTable(std::string name) {
     }
 
     if (tableCols.empty()) {
-        throw DatabaseException("Colonnes de la table non trouvees dans le catalogue");
+        throw DatabaseException("Table columns not found in the database");
     }
 
     // Create Table object

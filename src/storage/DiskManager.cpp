@@ -13,7 +13,7 @@ void DiskManager::writePage(std::shared_ptr<Page> page)
 
         dbFile.open("data.db", std::ios::in | std::ios::out | std::ios::binary);
         if (!dbFile.is_open()) {
-            throw DatabaseException("Impossible d'ouvrir le fichier data.db");
+            throw DatabaseException("Can't the read the database file");
         }
     }
 
@@ -32,7 +32,7 @@ void DiskManager::writePage(std::shared_ptr<Page> page)
     dbFile.write(reinterpret_cast<const char*>(page->serialize().data()), PAGE_SIZE);
 
     if (!dbFile.good()) {
-        throw DatabaseException("Erreur lors de l'ecriture de la page");
+        throw DatabaseException("Error when trying to write page");
     }
 }
 
@@ -40,7 +40,7 @@ std::shared_ptr<Page> DiskManager::readPage(int pageId)
 {
     std::ifstream dbFile("data.db", std::ios::binary);
     if (!dbFile.is_open()) {
-        throw DatabaseException("Impossible d'ouvrir le fichier pour lecture");
+        throw DatabaseException("Can't the read the database file");
     }
 
     size_t offset = static_cast<size_t>(pageId) * PAGE_SIZE;
@@ -49,7 +49,7 @@ std::shared_ptr<Page> DiskManager::readPage(int pageId)
     std::vector<uint8_t> buffer(PAGE_SIZE);
     dbFile.read(reinterpret_cast<char*>(buffer.data()), PAGE_SIZE);
     if (dbFile.gcount() < PAGE_SIZE) {
-        throw DatabaseException("La page n'existe pas");
+        throw DatabaseException("Page doesn't exist");
     }
     return std::make_shared<Page>(buffer);
 }

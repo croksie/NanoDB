@@ -97,9 +97,9 @@ void Page::insertTuple(Tuple& tuple)
 
 	size_t size = tupleData.size();
 
-	// Réserver les 16 premiers octets pour l'entête donc début = tupleData.at(15)
+	// Reserve the first 16 bytes for the header so it start at tupleData.at(15)
 
-	// Représentation des slots : 2 octes pour index + 2 octets pour la taille
+	// Slots representation : 2 bytes for the index + 2 bytes for the size
 	size_t nextSlot = HEADER_SIZE + (static_cast<size_t>(this->slotCount) * 4); // number of slots * size of a slot + header size
 	size_t nextTupleOffset = this->calculateNextTupleOffset();
 	size_t tupleStart = nextTupleOffset - size;
