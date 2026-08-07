@@ -2,14 +2,8 @@
 #include <fstream>
 
 BufferManager::BufferManager() {
-	std::ifstream file("data.db", std::ios::binary | std::ios::ate);
-	if (file.is_open()) {
-		std::streampos size = file.tellg();
-		this->nextPageId = static_cast<int>(size / PAGE_SIZE);
-		if (this->nextPageId < 2) {
-			this->nextPageId = 2;
-		}
-	} else {
+	this->nextPageId = dm.getNumberOfPages();
+	if (this->nextPageId < 2) {
 		this->nextPageId = 2;
 	}
 }

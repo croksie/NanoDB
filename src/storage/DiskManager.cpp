@@ -53,3 +53,15 @@ std::shared_ptr<Page> DiskManager::readPage(int pageId)
     }
     return std::make_shared<Page>(buffer);
 }
+
+int DiskManager::getNumberOfPages()
+{
+    std::ifstream dbFile("data.db", std::ios::binary);
+    if (!dbFile.is_open()) {
+        return 0;
+    }
+    else {
+        std::streampos fileSize = dbFile.tellg();
+        return static_cast<int>(fileSize / PAGE_SIZE);
+    }
+}
