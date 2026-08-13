@@ -7,6 +7,17 @@ x86/
 Debug/
 Release/
 *.user
+ALL_BUILD.dir/
+CMakeFiles/
+NanoDB/
+NanoDB.dir/
+*.vcxproj
+*.vcxproj.filters
+CMakeCache.txt
+CMakeLists.txt.user
+cmake_install.cmake
+install_manifest.txt
+NanoDB.slnx
 
 # Fichiers de données générés
 *.db
