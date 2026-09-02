@@ -20,5 +20,5 @@ cmake --build build --config Debug
 
 ## How to run
 ```bash
-./x64/Debug/NanoDB.exe
+./bin/Debug/NanoDB.exe
 ```
