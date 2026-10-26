@@ -1,6 +1,6 @@
 #include "Executor.h"
 
-Executor::Executor(const SelectStatement& node)
+Executor::Executor(Database& db, const SelectStatement& node) : db(db)
 {
 	this->executeSelect(node);
 }
@@ -16,6 +16,7 @@ void Executor::executeSelect(const SelectStatement& statement){
 		tuples = table->getTuples();
 	}
 	auto columns = table->getColumns();
+	std::cout << "Resultat de la requete : " << std::endl;
 	if (cre->columnName == "*") {
 		for (Tuple tuple : tuples) {
 			size_t offset = 0;

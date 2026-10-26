@@ -7,10 +7,9 @@
 class Executor {
 
 private:
-	Database db;
-	ASTNode maiNnode;
+	Database& db;
 
 public:
-	Executor(const SelectStatement& node);
+	Executor(Database& db, const SelectStatement& node);
 	void executeSelect(const SelectStatement& statement);
 };

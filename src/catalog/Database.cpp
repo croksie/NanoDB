@@ -14,21 +14,31 @@ void Database::stats() {
 	std::cout << "There are " << this->tables.size() << " tables in the db." << std::endl;
 }
 
+static std::string toLowerStr(std::string s) {
+	std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c) { return std::tolower(c); });
+	return s;
+}
+
 Table* Database::getTable(std::string name)
 {
-	if (this->tables.contains(name)) {
-		return this->tables.at(name).get();
+	for (auto& [tName, tablePtr] : this->tables) {
+		if (toLowerStr(tName) == toLowerStr(name)) {
+			return tablePtr.get();
+		}
 	}
-	else {
-		try
-		{
-			this->loadTable(name);
-			return this->tables.at(name).get();
+	try
+	{
+		this->loadTable(name);
+		for (auto& [tName, tablePtr] : this->tables) {
+			if (toLowerStr(tName) == toLowerStr(name)) {
+				return tablePtr.get();
+			}
 		}
-		catch (const DatabaseException&)
-		{
-			return nullptr;
-		}
+		return nullptr;
+	}
+	catch (const DatabaseException&)
+	{
+		return nullptr;
 	}
 }
 
@@ -50,8 +60,11 @@ void Database::createTable(std::string name, std::vector<Column> collumn) {
 }
 
 void Database::deleteTable(std::string name) {
-	if (this->tables.contains(name)) {
-		this->tables.erase(name);
+	for (auto it = this->tables.begin(); it != this->tables.end(); ++it) {
+		if (toLowerStr(it->first) == toLowerStr(name)) {
+			this->tables.erase(it);
+			break;
+		}
 	}
 }
 

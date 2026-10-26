@@ -33,15 +33,15 @@ std::vector<Token> Lexer::Analyse()
 			continue;
 		}
 
-		if (c == '"') {
-			size_t startPos = this->current_pos + 1;
+		if (c == '\'') {
+			size_t startPos = this->current_pos++;
 			while (this->current_pos < this->input.length() && 
 				   this->input[this->current_pos] != '\'') {
 				this->current_pos++;
 			}
-			std::string varcharStr = this->input.substr(startPos, this->current_pos - startPos - 1);
+			std::string varcharStr = this->rawInput.substr(startPos, this->current_pos - startPos - 1);
 			tokens.emplace_back(Token(TokenType::VARCHAR, varcharStr));
-
+			continue;
 		}
 
 		if (c == ',') {
@@ -62,6 +62,7 @@ std::vector<Token> Lexer::Analyse()
 		if (c == '>') {
 			if (this->input.at(this->current_pos + 1) == '=') {
 				tokens.emplace_back(Token(TokenType::GREATER_EQUAL, ">="));
+				this->current_pos++;
 			}
 			else {
 				tokens.emplace_back(Token(TokenType::GREATER, ">"));
@@ -72,6 +73,7 @@ std::vector<Token> Lexer::Analyse()
 		if (c == '<') {
 			if (this->input.at(this->current_pos + 1) == '=') {
 				tokens.emplace_back(Token(TokenType::LESS_EQUAL, "<="));
+				this->current_pos++;
 			}
 			else {
 				tokens.emplace_back(Token(TokenType::LESS, "<"));
@@ -82,6 +84,7 @@ std::vector<Token> Lexer::Analyse()
 		if (c == '!') {
 			if (this->input.at(this->current_pos + 1) == '=') {
 				tokens.emplace_back(Token(TokenType::NOT_EQUAL, "!="));
+				this->current_pos++;
 			}
 			else {
 				tokens.emplace_back(Token(TokenType::NOT, "!"));
@@ -104,8 +107,6 @@ std::vector<Token> Lexer::Analyse()
 			this->current_pos++;
 			continue;
 		}
-
-		// TODO : Emplement LESS, LESS_EQUAL, GREATER_EQUAL, NOT_EQUAL and PARENTHESIS
 
 
 		this->current_pos++;

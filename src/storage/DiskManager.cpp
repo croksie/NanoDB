@@ -1,5 +1,6 @@
 #include "DiskManager.h"
 #include <fstream>
+#include <filesystem>
 #include "DatabaseException.h"
 
 void DiskManager::writePage(std::shared_ptr<Page> page)
@@ -61,7 +62,10 @@ int DiskManager::getNumberOfPages()
         return 0;
     }
     else {
+        dbFile.seekg(0, std::ios::end);
         std::streampos fileSize = dbFile.tellg();
+        if (fileSize < 0) return 0;
+
         return static_cast<int>(fileSize / PAGE_SIZE);
     }
 }

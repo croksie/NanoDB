@@ -75,7 +75,7 @@ std::unique_ptr<DropTableStatement> Parser::parseDropTable()
 	this->advance();
 	this->consume(TokenType::KEYWORD_TABLE, "Table attendue aprés DROP");
 	this->advance();
-	Token table = this->consume(TokenType::KEYWORD_TABLE, "Nom de la table attendue aprés DROP");
+	Token table = this->consume(TokenType::IDENTIFIER, "Nom de la table attendue aprés DROP");
 	auto result = std::make_unique<DropTableStatement>();
 	result->tableName = table.value;
 	return std::move(result);
@@ -103,7 +103,7 @@ std::unique_ptr<Expression> Parser::parseOr()
 		this->advance();
 		auto orExpr = std::make_unique<BinaryOpExpr>();
 		orExpr.get()->left = std::move(left);
-		orExpr.get()->op = BinaryOpType::LOGICAL_AND;
+		orExpr.get()->op = BinaryOpType::LOGICAL_OR;
 		orExpr.get()->right = this->parseAnd();
 		left = std::move(orExpr);
 	}
