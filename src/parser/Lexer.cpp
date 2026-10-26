@@ -34,12 +34,18 @@ std::vector<Token> Lexer::Analyse()
 		}
 
 		if (c == '\'') {
-			size_t startPos = this->current_pos++;
+			this->current_pos++;
+			size_t startPos = this->current_pos;
 			while (this->current_pos < this->input.length() && 
 				   this->input[this->current_pos] != '\'') {
 				this->current_pos++;
 			}
-			std::string varcharStr = this->rawInput.substr(startPos, this->current_pos - startPos - 1);
+			std::string varcharStr = this->rawInput.substr(startPos, this->current_pos - startPos);
+
+			if (this->current_pos < this->input.length() && this->input[this->current_pos] == '\'') {
+				this->current_pos++;
+			}
+
 			tokens.emplace_back(Token(TokenType::VARCHAR, varcharStr));
 			continue;
 		}
