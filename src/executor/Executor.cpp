@@ -303,5 +303,5 @@ void Executor::executeInsert(const InsertStatement& statement)
 	}
 
 	table->insertTuple(std::move(values));
-	std::cout << "1 ligne inserted in '" << statement.tableName << "'." << std::endl;
+	std::cout << "1 ligne inse '" << statement.tableName << "'." << std::endl;
 }

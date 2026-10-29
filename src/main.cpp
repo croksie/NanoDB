@@ -2,14 +2,7 @@
 #include <memory>
 
 
-#include "Lexer.h"
-#include "Parser.h"
-#include "Executor.h"
-
-#include "Database.h"
-#include "DataType.h"
-#include "DatabaseException.h"
-#include "Utils.h"
+#include "nanodb/NanoDB.h"
 
 int parseCommand(Database& db, const std::string& command) {
 
