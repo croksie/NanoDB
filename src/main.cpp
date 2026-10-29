@@ -11,50 +11,68 @@
 #include "DatabaseException.h"
 #include "Utils.h"
 
+int parseCommand(Database& db, const std::string& command) {
+
+    if (command == ".exit") {
+        return 2;
+    }
+    else if (command == ".tables") {
+        Executor executor(db, "SELECT name FROM Systable;");
+        return 0;
+    }
+    else if (command == ".help") {
+        std::cout << "Commands : \n.tables : display all tables name\n.exit : exit the console\n.help : show this help" << std::endl;
+        return 0;
+    }
+    else {
+        return 1;
+    }
+
+}
+
 int main() {
     try {
         std::cout << "--- Initialisation de la base de donnees ---" << std::endl;
         Database db;
 
-     
 
-        Table* utilisateur = db.getTable("Utilisateurs");
-        if (utilisateur == nullptr) {
-            std::cout << "La table n'existe pas. Creation de la table 'Utilisateurs'..." << std::endl;
 
-            std::vector<Column> cols;
-            cols.push_back(Column(std::make_shared<IntType>(), "Id"));
-            cols.push_back(Column(std::make_shared<StringType>(), "name"));
-            cols.push_back(Column(std::make_shared<IntType>(), "note"));
+        std::string command;
 
-            db.createTable("Utilisateurs", cols);
+        while (true) {
+            std::cout << "NanoDB > ";
+            if (!std::getline(std::cin, command)) break;
+            if (command.find_first_not_of(" \t\r\n") == std::string::npos) {
+                continue;
+            }
+            int code = parseCommand(db, command);
+            if (code == 2) {
+                std::cout << "Goodbye" << std::endl;
+                break;
+            }
+            else if (code == 1) {
+                try {
+                    Executor(db, command);
+                }
+                catch (const std::exception& e) {
+                    std::cout << "Erreur standard capturee : " << e.what() << std::endl;
+                }
+                catch (...) {
+                    std::cout << "Une erreur inattendue est survenue." << std::endl;
+                }
+            }
+            else {
+                continue;
+            }
 
-            utilisateur = db.getTable("Utilisateurs");
 
-            std::cout << "Insertion des tuples de test..." << std::endl;
-            utilisateur->insertTuple(row(std::make_unique<IntValue>(1), std::make_unique<StringValue>("John"), std::make_unique<IntValue>(20)));
-            utilisateur->insertTuple(row(std::make_unique<IntValue>(2), std::make_unique<StringValue>("Simon"), std::make_unique<IntValue>(10)));
-            utilisateur->insertTuple(row(std::make_unique<IntValue>(3), std::make_unique<StringValue>("Martin"), std::make_unique<IntValue>(55)));
-        } else {
-            std::cout << "La table 'Utilisateurs' existe deja dans le catalogue et a ete chargee avec succes !" << std::endl;
         }
 
-        std::cout << "--- Affichage de la table ---" << std::endl;
-        utilisateur->displayTable();
-
-        db.stats();
-
-        Lexer lexer = Lexer("SELECT name, note FROM Utilisateurs WHERE note >= 20 AND name = 'John';");
-        std::vector<Token> tokens = lexer.Analyse();
-        Parser parser = Parser(tokens);
-        auto stmt = parser.parseSelect();
-        if (stmt) {
-            Executor executor(db, *stmt);
-        }
-
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e) {
         std::cerr << "Erreur standard capturee : " << e.what() << std::endl;
-    } catch (...) {
+    }
+    catch (...) {
         std::cerr << "Une erreur inattendue est survenue." << std::endl;
     }
 
