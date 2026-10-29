@@ -73,11 +73,23 @@ struct BaseTableRef : public TableRef {
 
 /* STATEMENT */
 
-struct Statement : public ASTNode {};
+enum class StatementType {
+    SELECT,
+    INSERT,
+    CREATE_TABLE,
+    DROP_TABLE
+};
+
+struct Statement : public ASTNode {
+    StatementType statementType;
+    Statement(StatementType type) : statementType(type) {}
+    virtual ~Statement() = default;
+};
 
 // --- SELECT ---
 
 struct SelectStatement : public Statement {
+    SelectStatement() : Statement(StatementType::SELECT) {}
     std::vector<std::unique_ptr<Expression>> projections;
     std::unique_ptr<TableRef> fromTable;
     std::unique_ptr<Expression> whereClause;
@@ -96,19 +108,22 @@ struct ColumnDefinition {
 };
 
 struct CreateTableStatement : public Statement {
+    CreateTableStatement() : Statement(StatementType::CREATE_TABLE) {}
     std::string tableName;
     std::vector<ColumnDefinition> columns;
 };
 
 // --- DROP TABLE ---
 struct DropTableStatement : public Statement {
+    DropTableStatement() : Statement(StatementType::DROP_TABLE) {}
     std::string tableName;
 };
 
 // --- INSERT ---
 struct InsertStatement : public Statement {
+    InsertStatement() : Statement(StatementType::INSERT) {}
     std::string tableName;
     std::vector<std::string> columns;
 
-    std::vector<std::vector<std::unique_ptr<Expression>>> valuesGrid;
+    std::vector<std::unique_ptr<Expression>> valuesGrid;
 };

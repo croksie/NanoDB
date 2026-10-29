@@ -5,7 +5,8 @@
 enum class TokenType {
     KEYWORD_SELECT, KEYWORD_FROM, KEYWORD_WHERE, 
     KEYWORD_INSERT, KEYWORD_INTO, KEYWORD_VALUES,
-    KEYWORD_CREATE, KEYWORD_TABLE, KEYWORD_DROP,
+    KEYWORD_CREATE, KEYWORD_TABLE, KEYWORD_DROP, 
+	KEYWORD_VARCHAR, KEYWORD_NUMBER, 
     IDENTIFIER, NUMBER, VARCHAR, COMMA, SEMICOLON,
     EQUAL, GREATER, GREATER_EQUAL, LESS, LESS_EQUAL,
 	NOT, NOT_EQUAL, AND, OR, STAR, LEFT_PARENTHESIS,
@@ -15,17 +16,19 @@ enum class TokenType {
 
 inline TokenType matchKeyword(const std::string& word) {
 	static const std::unordered_map<std::string, TokenType> keywords = {
-		{"select", TokenType::KEYWORD_SELECT},
-		{"from",   TokenType::KEYWORD_FROM},
-		{"where",  TokenType::KEYWORD_WHERE},
-		{"insert", TokenType::KEYWORD_INSERT},
-		{"into",   TokenType::KEYWORD_INTO},
-		{"values", TokenType::KEYWORD_VALUES},
-		{"create", TokenType::KEYWORD_CREATE},
-		{"table",  TokenType::KEYWORD_TABLE},
-		{"drop",   TokenType::KEYWORD_DROP},
-		{"and",   TokenType::AND},
-		{"or",    TokenType::OR}
+		{ "select", TokenType::KEYWORD_SELECT },
+		{ "from",   TokenType::KEYWORD_FROM },
+		{ "where",  TokenType::KEYWORD_WHERE },
+		{ "insert", TokenType::KEYWORD_INSERT },
+		{ "into",   TokenType::KEYWORD_INTO },
+		{ "values", TokenType::KEYWORD_VALUES },
+		{ "create", TokenType::KEYWORD_CREATE },
+		{ "table",  TokenType::KEYWORD_TABLE },
+		{ "drop",   TokenType::KEYWORD_DROP },
+		{ "and",   TokenType::AND },
+		{ "or",    TokenType::OR },
+		{ "varchar", TokenType::KEYWORD_VARCHAR },
+		{ "number" , TokenType::KEYWORD_NUMBER }
 	};
 
 	auto it = keywords.find(word);

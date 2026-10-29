@@ -61,37 +61,6 @@ std::vector<Tuple> Table::getTuples() {
 	return result;
 }
 
-
-std::vector<Tuple> Table::searchTuple(std::vector<std::string> cols, std::vector<std::shared_ptr<DataValue>> datas) {
-	this->loadedPage = this->bm.getPage(firstPageIndex);
-
-	std::vector<Tuple> result;
-	int nextPageId = 0;
-	do {
-		if (nextPageId != 0) this->nextPage();
-		for (int i = 0; i < this->loadedPage->slotCount; ++i) {
-			Tuple tuple = Tuple(this->loadedPage->getTuple(i));
-			std::vector<std::shared_ptr<DataValue>> values = tuple.deserialize(this->columns);
-			size_t numberOfValue = cols.size();
-			for (int i = 0; i < this->columns.size(); ++i) {
-				for (int j = 0; j < cols.size(); ++j) {
-					if (this->columns.at(i).getName() == cols.at(j)) {
-						if ((*datas.at(j)).toString() == (*values.at(i)).toString()) {
-							numberOfValue -= 1;
-						}
-					}
-				}
-			}
-			if (numberOfValue == 0) {
-				result.push_back(tuple);
-			}
-		}
-		nextPageId = this->loadedPage->nextPageId;
-	} while (nextPageId != 0);
-
-	return result;
-}
-
 void Table::displayTable()
 {
 	this->loadedPage = this->bm.getPage(firstPageIndex);

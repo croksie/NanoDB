@@ -25,6 +25,10 @@ private:
 		const std::vector<Column>& tableColumns
 	);
 
+	std::unique_ptr<DataValue> evaluateExpr(
+		const Expression* expr
+	);
+
 	bool compareValues(
 		const DataValue& left,
 		BinaryOpType op,
@@ -33,5 +37,11 @@ private:
 
 public:
 	Executor(Database& db, const SelectStatement& node);
+	Executor(Database& db, std::string input);
+
+	void executeStatement(const Statement& statement);
 	void executeSelect(const SelectStatement& statement);
+	void executeDrop(const DropTableStatement& statement);
+	void executeCreate(const CreateTableStatement& statement);
+	void executeInsert(const InsertStatement& statement);
 };

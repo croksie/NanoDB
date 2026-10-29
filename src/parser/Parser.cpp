@@ -30,7 +30,7 @@ Token Parser::consume(TokenType type, std::string error_msg)
 	return token;
 }
 
-std::unique_ptr<ASTNode> Parser::parseStatement()
+std::unique_ptr<Statement> Parser::parseStatement()
 {
 	switch (this->peek().type) {
 		case TokenType::KEYWORD_SELECT:
@@ -38,11 +38,15 @@ std::unique_ptr<ASTNode> Parser::parseStatement()
 			break;
 		case TokenType::KEYWORD_DROP:
 			return this->parseDropTable();
+		case TokenType::KEYWORD_CREATE:
+			return this->parseCreateTable();
+		case TokenType::KEYWORD_INSERT:
+			return this->parseInsert();
 		default:
 			throw DatabaseException("Expression non reconnue");
 			break;
 	}
-	return std::unique_ptr<ASTNode>();
+	return nullptr;
 }
 
 std::unique_ptr<SelectStatement> Parser::parseSelect()
@@ -73,12 +77,107 @@ std::unique_ptr<SelectStatement> Parser::parseSelect()
 std::unique_ptr<DropTableStatement> Parser::parseDropTable()
 {
 	this->advance();
-	this->consume(TokenType::KEYWORD_TABLE, "Table attendue aprés DROP");
-	this->advance();
-	Token table = this->consume(TokenType::IDENTIFIER, "Nom de la table attendue aprés DROP");
+	this->consume(TokenType::KEYWORD_TABLE, "TABLE expected after CREATE");
+	Token table = this->consume(TokenType::IDENTIFIER, "Table name expected after TABLE");
+	if (this->check(TokenType::SEMICOLON)) {
+		this->advance();
+	}
 	auto result = std::make_unique<DropTableStatement>();
 	result->tableName = table.value;
-	return std::move(result);
+	return result;
+}
+
+std::unique_ptr<CreateTableStatement> Parser::parseCreateTable()
+{
+	this->advance();
+	this->consume(TokenType::KEYWORD_TABLE, "TABLE expected after CREATE");
+	Token table = this->consume(TokenType::IDENTIFIER, "Table name expected after TABLE");
+	this->consume(TokenType::LEFT_PARENTHESIS, "Parenthesis expected");
+
+	auto result = std::make_unique<CreateTableStatement>();
+	auto columns = std::vector<ColumnDefinition>();
+
+	while (!this->check(TokenType::RIGHT_PARENTHESIS)) {
+		Token columnName = this->consume(TokenType::IDENTIFIER, "Column Name expected");
+		if (this->check(TokenType::KEYWORD_NUMBER)) {
+			this->advance();
+			columns.emplace_back(columnName.value, Type::Number, 0);
+		}
+		else if (this->check(TokenType::KEYWORD_VARCHAR)) {
+			this->advance();
+			int size = 255;
+			if (this->check(TokenType::LEFT_PARENTHESIS)) {
+				this->advance();
+				Token sizeToken = this->consume(TokenType::NUMBER, "Expected a number");
+				size = std::stoi(sizeToken.value);
+				this->consume(TokenType::RIGHT_PARENTHESIS, "Expected right parenthesis");
+			}
+			columns.emplace_back(columnName.value, Type::Varchar, size);
+		}
+		else {
+			throw DatabaseException("Invalid Token for column type");
+		}
+
+		if (this->check(TokenType::COMMA)) {
+			this->advance();
+		}
+		else {
+			break;
+		}
+	}
+	this->consume(TokenType::RIGHT_PARENTHESIS, "Expected right parenthesis");
+	if (this->check(TokenType::SEMICOLON)) {
+		this->advance();
+	}
+	result->tableName = table.value;
+	result->columns = columns;
+	return result;
+}
+
+std::unique_ptr<InsertStatement> Parser::parseInsert()
+{
+	this->advance();
+	this->consume(TokenType::KEYWORD_INTO, "INTO expected after INSERT");
+	Token table = this->consume(TokenType::IDENTIFIER, "Table name expected after INTO");
+	auto columnsNames = std::vector<std::string>();
+	if (this->check(TokenType::LEFT_PARENTHESIS)) {
+		this->advance();
+		while (!this->check(TokenType::RIGHT_PARENTHESIS)) {
+			Token columnName = this->consume(TokenType::IDENTIFIER, "Column Name expected");
+			columnsNames.emplace_back(columnName.value);
+			if (this->check(TokenType::COMMA)) {
+				this->advance();
+			}
+			else {
+				break;
+			}
+		}
+		this->consume(TokenType::RIGHT_PARENTHESIS, "Expected right parenthesis after column list");
+	}
+
+	this->consume(TokenType::KEYWORD_VALUES, "Expected Token VALUES");
+	this->consume(TokenType::LEFT_PARENTHESIS, "Expected left parenthesis");
+
+	auto columnsValue = std::vector<std::unique_ptr<Expression>>();
+	while (!this->check(TokenType::RIGHT_PARENTHESIS)) {
+		columnsValue.emplace_back(this->parsePrimary());
+		if (this->check(TokenType::COMMA)) {
+			this->advance();
+		}
+		else {
+			break;
+		}
+	}
+	this->consume(TokenType::RIGHT_PARENTHESIS, "Expected right parenthesis after values");
+	if (this->check(TokenType::SEMICOLON)) {
+		this->advance();
+	}
+
+	auto result = std::make_unique<InsertStatement>();
+	result->tableName = table.value;
+	result->columns = columnsNames;
+	result->valuesGrid = std::move(columnsValue);
+	return result;
 }
 
 std::unique_ptr<TableRef> Parser::parseTableRef()

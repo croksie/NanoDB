@@ -83,7 +83,7 @@ void Database::loadTable(std::string name) {
     for (const auto& tuple : sysTableTuple) {
 		std::vector<std::shared_ptr<DataValue>> row = tuple.deserialize(sysTables->getColumns());
         std::string tableName = std::any_cast<std::string>(row.at(0)->getValue());
-        if (tableName == name) {
+        if (toLowerStr(tableName) == toLowerStr(name)) {
             tableFirstPageIndex = std::any_cast<int>(row.at(1)->getValue());
             break;
         }
@@ -99,7 +99,7 @@ void Database::loadTable(std::string name) {
     for (const auto& tuple : sysColsRows) {
 		std::vector<std::shared_ptr<DataValue>> row = tuple.deserialize(sysCols->getColumns());
         std::string tableName = std::any_cast<std::string>(row.at(0)->getValue());
-        if (tableName == name) {
+        if (toLowerStr(tableName) == toLowerStr(name)) {
             std::string colName = std::any_cast<std::string>(row.at(1)->getValue());
             std::string dataType = std::any_cast<std::string>(row.at(2)->getValue());
             

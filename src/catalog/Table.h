@@ -30,7 +30,6 @@ public:
 	Tuple createTuple(int slotIndex);
 
 	std::vector<Tuple> getTuples();
-	std::vector<Tuple> searchTuple(std::vector<std::string> cols, std::vector<std::shared_ptr<DataValue>> datas);
 
 	void displayTable();
 	// TODO : Create a function that return the first free space by passing the size of the space in parameter
