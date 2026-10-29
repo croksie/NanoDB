@@ -10,7 +10,7 @@ public:
 	const Type type;
 	
 	DataValue(Type t) : type(t) {};
-	~DataValue() = default;
+	virtual ~DataValue() = default;
 	virtual std::any getValue() const = 0;
 	virtual std::string toString() const = 0;
 
