@@ -9,7 +9,7 @@ Release/
 *.user
 ALL_BUILD.dir/
 CMakeFiles/
-NanoDB/
+/NanoDB/
 NanoDB.dir/
 *.vcxproj
 *.vcxproj.filters
