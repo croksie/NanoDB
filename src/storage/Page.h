@@ -9,16 +9,16 @@ constexpr auto HEADER_SIZE = 16;
 class Page
 {
 private:
-	std::vector<uint8_t> data;
+	std::vector<uint8_t> m_data;
 
 public:
-	int pageId = 0;
-	int nextPageId = 0;
-	int prevPageId =0;
-	int slotCount = 0;
+	int m_pageId = 0;
+	int m_nextPageId = 0;
+	int m_prevPageId =0;
+	int m_slotCount = 0;
 
 	Page();
-	Page(std::vector<uint8_t> data);
+	Page(const std::vector<uint8_t>& data);
 	Page(int pageId, int prevPageId);
 
 	std::vector<uint8_t> serialize() const;
