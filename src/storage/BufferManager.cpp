@@ -2,9 +2,9 @@
 #include <fstream>
 
 BufferManager::BufferManager() {
-	this->nextPageId = dm.getNumberOfPages();
-	if (this->nextPageId < 2) {
-		this->nextPageId = 2;
+	m_nextPageId = m_diskManager.getNumberOfPages();
+	if (m_nextPageId < 2) {
+		m_nextPageId = 2;
 	}
 }
 
@@ -15,20 +15,20 @@ BufferManager::~BufferManager()
 
 std::shared_ptr<Page> BufferManager::getPage(int pageId)
 {
-	this->globalClock++;
-	auto it = this->bufferPool.find(pageId);
-	if (it != this->bufferPool.end()) {
-		this->numberOfUseSinceLoaded[pageId]++;
-		this->lastUse[pageId] = this->globalClock;
+	m_globalClock++;
+	auto it = m_bufferPool.find(pageId);
+	if (it != m_bufferPool.end()) {
+		m_numberOfUseSinceLoaded[pageId]++;
+		m_lastUse[pageId] = m_globalClock;
 		return it->second;
 	}
 	else {
-		if (this->bufferPool.size() > MAX_LAODED_PAGE) {
+		if (m_bufferPool.size() > MAX_LAODED_PAGE) {
 			int bestCandidate = 0;
 			double bestCandidateScore = 0.0;
-			for (auto const& [id, page] : this->bufferPool) {
-				uint64_t age = (globalClock - this->lastUse[id]);
-				double freqPenalty = 1.0 / (1.0 + this->numberOfUseSinceLoaded[id]);
+			for (auto const& [id, page] : m_bufferPool) {
+				uint64_t age = (m_globalClock - m_lastUse[id]);
+				double freqPenalty = 1.0 / (1.0 + m_numberOfUseSinceLoaded[id]);
 				double score = static_cast<double>(age) * freqPenalty;
 				if (bestCandidateScore < score) {
 					bestCandidate = id;
@@ -37,41 +37,41 @@ std::shared_ptr<Page> BufferManager::getPage(int pageId)
 			}
 			this->flushPage(bestCandidate);
 		}
-		std::shared_ptr<Page> p = this->dm.readPage(pageId);
-		this->bufferPool[pageId] = p;
-		this->numberOfUseSinceLoaded[pageId] = 1;
-		this->lastUse[pageId] = this->globalClock;
-		return this->bufferPool[pageId];
+		std::shared_ptr<Page> p = m_diskManager.readPage(pageId);
+		m_bufferPool[pageId] = p;
+		m_numberOfUseSinceLoaded[pageId] = 1;
+		m_lastUse[pageId] = m_globalClock;
+		return m_bufferPool[pageId];
 	}
 }
 
 void BufferManager::flushPage(int pageId)
 {
-	auto it = this->bufferPool.find(pageId);
-	if (it != this->bufferPool.end()) {
-		this->dm.writePage(it->second);
-		this->bufferPool.erase(pageId);
-		this->numberOfUseSinceLoaded.erase(pageId);
-		this->lastUse.erase(pageId);
+	auto it = m_bufferPool.find(pageId);
+	if (it != m_bufferPool.end()) {
+		m_diskManager.writePage(it->second);
+		m_bufferPool.erase(pageId);
+		m_numberOfUseSinceLoaded.erase(pageId);
+		m_lastUse.erase(pageId);
 	}
 }
 
 void BufferManager::flushAll()
 {
-	for (auto const& [id, page] : this->bufferPool) {
-		this->dm.writePage(page);
+	for (auto const& [id, page] : m_bufferPool) {
+		m_diskManager.writePage(page);
 	}
-	this->bufferPool.clear();
-	this->numberOfUseSinceLoaded.clear();
-	this->lastUse.clear();
+	m_bufferPool.clear();
+	m_numberOfUseSinceLoaded.clear();
+	m_lastUse.clear();
 }
 
 void BufferManager::saveNewPage(std::shared_ptr<Page> page)
 {
-	this->dm.writePage(page);
+	m_diskManager.writePage(page);
 }
 
 int BufferManager::allocatePage()
 {
-	return ++this->nextPageId;
+	return m_nextPageId++;
 }

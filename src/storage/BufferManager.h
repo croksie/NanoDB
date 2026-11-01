@@ -7,15 +7,15 @@
 constexpr auto MAX_LAODED_PAGE = 10;
 
 class BufferManager {
-	DiskManager dm = DiskManager();
+	DiskManager m_diskManager;
 
-	uint64_t globalClock = 0;
+	uint64_t m_globalClock = 0;
 
-	std::unordered_map<int, std::shared_ptr<Page>> bufferPool;
-	std::unordered_map<int, uint64_t> numberOfUseSinceLoaded;
-	std::unordered_map<int, uint64_t> lastUse;
+	std::unordered_map<int, std::shared_ptr<Page>> m_bufferPool;
+	std::unordered_map<int, uint64_t> m_numberOfUseSinceLoaded;
+	std::unordered_map<int, uint64_t> m_lastUse;
 
-	int nextPageId = 0;
+	int m_nextPageId = 0;
 
 
 public:

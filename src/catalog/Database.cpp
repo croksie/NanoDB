@@ -7,11 +7,11 @@ Database::Database() {
 }
 
 void Database::clear() {
-	this->tables.clear();
+	m_tables.clear();
 }
 
 void Database::stats() {
-	std::cout << "There are " << this->tables.size() << " tables in the db." << std::endl;
+	std::cout << "There are " << m_tables.size() << " tables in the db." << std::endl;
 }
 
 static std::string toLowerStr(std::string s) {
@@ -21,7 +21,7 @@ static std::string toLowerStr(std::string s) {
 
 Table* Database::getTable(std::string name)
 {
-	for (auto& [tName, tablePtr] : this->tables) {
+	for (auto& [tName, tablePtr] : m_tables) {
 		if (toLowerStr(tName) == toLowerStr(name)) {
 			return tablePtr.get();
 		}
@@ -29,7 +29,7 @@ Table* Database::getTable(std::string name)
 	try
 	{
 		this->loadTable(name);
-		for (auto& [tName, tablePtr] : this->tables) {
+		for (auto& [tName, tablePtr] : m_tables) {
 			if (toLowerStr(tName) == toLowerStr(name)) {
 				return tablePtr.get();
 			}
@@ -44,13 +44,13 @@ Table* Database::getTable(std::string name)
 
 
 void Database::createTable(std::string name, std::vector<Column> collumn) {
-	int firstPageIndex = this->bm.allocatePage();
-	this->tables[name] = std::make_unique<Table>(name, collumn, firstPageIndex, this->bm);
-	this->tables["Systable"]->insertTuple(row(std::make_unique<StringValue>(name), std::make_unique<IntValue>(firstPageIndex)));
+	int firstPageIndex = m_bm.allocatePage();
+	m_tables[name] = std::make_unique<Table>(name, collumn, firstPageIndex, m_bm);
+	m_tables["Systable"]->insertTuple(row(std::make_unique<StringValue>(name), std::make_unique<IntValue>(firstPageIndex)));
 
 	for (Column c : collumn) {
 		std::string type = (c.getDataType()->getTypeName() == Type::Number) ? "Number" : "Varchar";
-		this->tables["Syscols"]->insertTuple(
+		m_tables["Syscols"]->insertTuple(
 			row(std::make_unique<StringValue>(name), 
 				std::make_unique<StringValue>(c.getName()),
 				std::make_unique<StringValue>(type),
@@ -60,9 +60,9 @@ void Database::createTable(std::string name, std::vector<Column> collumn) {
 }
 
 void Database::deleteTable(std::string name) {
-	for (auto it = this->tables.begin(); it != this->tables.end(); ++it) {
+	for (auto it = m_tables.begin(); it != m_tables.end(); ++it) {
 		if (toLowerStr(it->first) == toLowerStr(name)) {
-			this->tables.erase(it);
+			m_tables.erase(it);
 			break;
 		}
 	}
@@ -73,8 +73,8 @@ void Database::deleteTable(std::string name) {
 
 
 void Database::loadTable(std::string name) {
-    Table* sysTables = this->tables.at("Systable").get();
-    Table* sysCols = this->tables.at("Syscols").get();
+    Table* sysTables = m_tables.at("Systable").get();
+    Table* sysCols = m_tables.at("Syscols").get();
 
 
 	// Retrieve firstPageIndex
@@ -118,7 +118,7 @@ void Database::loadTable(std::string name) {
     }
 
     // Create Table object
-    this->tables[name] = std::make_unique<Table>(name, tableCols, tableFirstPageIndex, this->bm);
+    m_tables[name] = std::make_unique<Table>(name, tableCols, tableFirstPageIndex, m_bm);
 }
 
 
@@ -128,7 +128,7 @@ void Database::loadSystemsTables()
 	SystableCols.push_back(Column(std::make_shared<StringType>(), "name"));
 	SystableCols.push_back(Column(std::make_shared<IntType>(), "firstPageIndex"));
 
-	this->tables["Systable"] = std::make_unique<Table>("Systable", SystableCols, 0, this->bm);
+	m_tables["Systable"] = std::make_unique<Table>("Systable", SystableCols, 0, m_bm);
 
 	std::vector<Column> SyscolsCols;
 	SyscolsCols.push_back(Column(std::make_shared<StringType>(), "tableName"));
@@ -136,5 +136,5 @@ void Database::loadSystemsTables()
 	SyscolsCols.push_back(Column(std::make_shared<StringType>(), "dataType"));
 	SyscolsCols.push_back(Column(std::make_shared<IntType>(), "isNullable"));
 
-	this->tables["Syscols"] = std::make_unique<Table>("Syscols", SyscolsCols, 1, this->bm);
+	m_tables["Syscols"] = std::make_unique<Table>("Syscols", SyscolsCols, 1, m_bm);
 }

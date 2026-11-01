@@ -1,26 +1,27 @@
 #pragma once
-#include <string>
-#include <memory>
 #include "DataType.h"
+#include <memory>
+#include <string>
 
-class Column
-{
-	std::string name;
-	std::shared_ptr<DataType> data;
 
-	//Constraints
+class Column {
+  std::string m_name;
+  std::shared_ptr<DataType> m_dataType;
 
-	bool isNullable = false;
+  // Constraints
+
+  bool m_isNullable = false;
 
 public:
-	Column(std::shared_ptr<DataType> dataType, std::string name) : data(dataType), name(name) {}
-	Column(std::vector<uint8_t> data);
+  Column(std::shared_ptr<DataType> dataType, std::string name)
+      : m_dataType(dataType), m_name(name) {}
+  Column(std::vector<uint8_t> data);
 
-	~Column() = default;
+  ~Column() = default;
 
-	std::shared_ptr<DataType> getDataType() const { return this->data; }
-	std::string getName() const { return this->name; }
-	bool getIsNullable() const { return this->isNullable; }
+  std::shared_ptr<DataType> getDataType() const { return m_dataType; }
+  std::string getName() const { return m_name; }
+  bool getIsNullable() const { return m_isNullable; }
 
-	std::vector<uint8_t> serialize();
+  std::vector<uint8_t> serialize();
 };

@@ -11,19 +11,19 @@
 class Table
 {
 private:
-	int firstPageIndex = 0;
-	std::string name;
-	std::vector<Column> columns;
+	int m_firstPageIndex = 0;
+	std::string m_name;
+	std::vector<Column> m_columns;
 
-	std::shared_ptr<Page> loadedPage;
+	std::shared_ptr<Page> m_loadedPage;
 
-	BufferManager& bm;
+	BufferManager& m_bm;
 
 public:
 	Table(std::string name, std::vector<Column> column, int firstPageIndex, BufferManager& bm);
 
 	std::string getName() const;
-	const std::vector<Column>& getColumns() const { return this->columns; }
+	const std::vector<Column>& getColumns() const { return m_columns; }
 
 	void insertTuple(std::vector<std::unique_ptr<DataValue>> data);
 	void insertTupleIntoPage(Tuple& tuple);

@@ -3,24 +3,24 @@
 
 
 Table::Table(std::string name, std::vector<Column> column, int firstPageIndex, BufferManager& bm) 
-	: columns(column), name(name), bm(bm), firstPageIndex(firstPageIndex) 
+	: m_columns(column), m_name(name), m_bm(bm), m_firstPageIndex(firstPageIndex) 
 {
 	try {
-		this->loadedPage = this->bm.getPage(firstPageIndex);
+		m_loadedPage = m_bm.getPage(m_firstPageIndex);
 	} catch (...) {
-		std::shared_ptr<Page> newPage = std::make_shared<Page>(firstPageIndex, 0);
-		this->bm.saveNewPage(newPage);
-		this->loadedPage = this->bm.getPage(firstPageIndex);
+		std::shared_ptr<Page> newPage = std::make_shared<Page>(m_firstPageIndex, 0);
+		m_bm.saveNewPage(newPage);
+		m_loadedPage = m_bm.getPage(m_firstPageIndex);
 	}
 }
 
 std::string Table::getName() const {
-	return this->name;
+	return m_name;
 }
 
 
 void Table::insertTuple(std::vector<std::unique_ptr<DataValue>> data) {
-	Tuple tuple = Tuple::serialize(data, this->columns);
+	Tuple tuple = Tuple::serialize(data, m_columns);
 	insertTupleIntoPage(tuple);
 }
 
@@ -28,7 +28,7 @@ void Table::insertTupleIntoPage(Tuple& tuple)
 {
 	try
 	{
-		this->loadedPage->insertTuple(tuple);
+		m_loadedPage->insertTuple(tuple);
 	}
 	catch (const DatabaseException&) // No more space in the current page
 	{
@@ -39,23 +39,23 @@ void Table::insertTupleIntoPage(Tuple& tuple)
 
 Tuple Table::createTuple(int slotIndex)
 {
-	std::vector<uint8_t> data = this->loadedPage->getTuple(slotIndex);
+	std::vector<uint8_t> data = m_loadedPage->getTuple(slotIndex);
 
 	return Tuple(data);
 }
 
 std::vector<Tuple> Table::getTuples() {
-	this->loadedPage = this->bm.getPage(firstPageIndex);
+	m_loadedPage = m_bm.getPage(m_firstPageIndex);
 
 	std::vector<Tuple> result;
 	int nextPageId = 0;
 	do {
 		if (nextPageId != 0) this->nextPage();
-		for (int i = 0; i < this->loadedPage->slotCount; ++i) {
-			Tuple tuple = Tuple(this->loadedPage->getTuple(i));
+		for (int i = 0; i < m_loadedPage->m_slotCount; ++i) {
+			Tuple tuple = Tuple(m_loadedPage->getTuple(i));
 			result.push_back(tuple);
 		}
-		nextPageId = this->loadedPage->nextPageId;
+		nextPageId = m_loadedPage->m_nextPageId;
 	} while (nextPageId != 0);
 
 	return result;
@@ -63,44 +63,44 @@ std::vector<Tuple> Table::getTuples() {
 
 void Table::displayTable()
 {
-	this->loadedPage = this->bm.getPage(firstPageIndex);
+	m_loadedPage = m_bm.getPage(m_firstPageIndex);
 	int nextPageId = 0;
 	do {
 		if (nextPageId != 0) this->nextPage();
-		for (int i = 0; i < this->loadedPage->slotCount; ++i) {
-			std::vector<uint8_t> tuple = this->loadedPage->getTuple(i);
+		for (int i = 0; i < m_loadedPage->m_slotCount; ++i) {
+			std::vector<uint8_t> tuple = m_loadedPage->getTuple(i);
 
 			size_t offset = 0;
-			for (size_t colIdx = 0; colIdx < this->columns.size(); colIdx++) {
-				Column c = this->columns.at(colIdx);
+			for (size_t colIdx = 0; colIdx < m_columns.size(); colIdx++) {
+				Column c = m_columns.at(colIdx);
 				std::unique_ptr<DataValue> valuePtr = c.getDataType()->deserialize(tuple, offset);
 				std::cout << valuePtr->toString() << " ";
 			}
 			std::cout << std::endl;
 		}
-		nextPageId = this->loadedPage->nextPageId;
+		nextPageId = m_loadedPage->m_nextPageId;
 	} while (nextPageId != 0);
 }
 
 void Table::nextPage()
 {
-	int nextPageId = this->loadedPage->nextPageId;
+	int nextPageId = m_loadedPage->m_nextPageId;
 	if (nextPageId == 0) {
-		int newPageId = this->bm.allocatePage();
-		std::shared_ptr<Page> newPage = std::make_shared<Page>(newPageId, this->loadedPage->pageId);
-		this->loadedPage->nextPageId = newPageId;
-		this->bm.saveNewPage(newPage);
+		int newPageId = m_bm.allocatePage();
+		std::shared_ptr<Page> newPage = std::make_shared<Page>(newPageId, m_loadedPage->m_pageId);
+		m_loadedPage->m_nextPageId = newPageId;
+		m_bm.saveNewPage(newPage);
 		nextPageId = newPageId;
 	}
-	this->bm.flushPage(this->loadedPage->pageId);
-	this->loadedPage = this->bm.getPage(nextPageId);
+	m_bm.flushPage(m_loadedPage->m_pageId);
+	m_loadedPage = m_bm.getPage(nextPageId);
 }
 
 void Table::prevPage()
 {
-	int prevPageId = this->loadedPage->prevPageId;
+	int prevPageId = m_loadedPage->m_prevPageId;
 	if (prevPageId != 0) {
-		this->bm.flushPage(this->loadedPage->pageId);
-		this->loadedPage = this->bm.getPage(prevPageId);
+		m_bm.flushPage(m_loadedPage->m_pageId);
+		m_loadedPage = m_bm.getPage(prevPageId);
 	}
 }

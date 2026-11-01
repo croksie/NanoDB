@@ -9,10 +9,10 @@
 class Parser {
 
 private:
-	std::vector<Token> tokens;
-	std::vector<ASTNode> nodes;
+	std::vector<Token> m_tokens;
+	std::vector<ASTNode> m_nodes;
 
-	size_t current = 0;
+	size_t m_current = 0;
 
 public:
 	Parser(std::vector<Token> tokens);

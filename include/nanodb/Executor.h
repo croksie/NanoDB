@@ -7,7 +7,7 @@
 class Executor {
 
 private:
-	Database& db;
+	Database& m_db;
 
 	std::vector<size_t> resolveProjections(
 		const std::vector<std::unique_ptr<Expression>>& projections,

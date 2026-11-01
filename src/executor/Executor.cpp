@@ -112,7 +112,7 @@ std::unique_ptr<DataValue> Executor::evaluateExpr(const Expression* expr)
 
 bool Executor::compareValues(const DataValue& left, BinaryOpType op, const DataValue& right)
 {
-	if (left.type != right.type) {
+	if (left.m_type != right.m_type) {
 		throw DatabaseException("Compare two different type is not allowed");
 	}
 	switch (op)
@@ -155,12 +155,12 @@ bool Executor::compareValues(const DataValue& left, BinaryOpType op, const DataV
 	return false;
 }
 
-Executor::Executor(Database& db, const SelectStatement& node) : db(db)
+Executor::Executor(Database& db, const SelectStatement& node) : m_db(db)
 {
 	this->executeSelect(node);
 }
 
-Executor::Executor(Database& db, std::string input) : db(db)
+Executor::Executor(Database& db, std::string input) : m_db(db)
 {
 	Lexer lexer = Lexer(input);
 	std::vector<Token> tokens = lexer.Analyse();
@@ -190,7 +190,7 @@ void Executor::executeStatement(const Statement& statement) {
 
 void Executor::executeSelect(const SelectStatement& statement){
 	auto* fromTable = static_cast<BaseTableRef*>(statement.fromTable.get());
-	Table* table = this->db.getTable(fromTable->tableName);
+	Table* table = m_db.getTable(fromTable->tableName);
 	if (!table) {
 		throw DatabaseException("Table '" + fromTable->tableName + "' not found");
 	}
@@ -215,7 +215,7 @@ void Executor::executeSelect(const SelectStatement& statement){
 }
 
 void Executor::executeDrop(const DropTableStatement& statement) {
-	db.deleteTable(statement.tableName);
+	m_db.deleteTable(statement.tableName);
 	std::cout << "Table '" << statement.tableName << "' delete." << std::endl;
 }
 
@@ -235,13 +235,13 @@ void Executor::executeCreate(const CreateTableStatement& statement) {
 		}
 	};
 
-	db.createTable(statement.tableName, columns);
+	m_db.createTable(statement.tableName, columns);
 	std::cout << "Table '" << statement.tableName << "' created." << std::endl;
 }
 
 void Executor::executeInsert(const InsertStatement& statement)
 {
-	Table* table = this->db.getTable(statement.tableName);
+	Table* table = m_db.getTable(statement.tableName);
 	if (!table) {
 		throw DatabaseException("Table '" + statement.tableName + "' not found");
 	}
@@ -259,7 +259,7 @@ void Executor::executeInsert(const InsertStatement& statement)
 			if (!values[i]) {
 				throw DatabaseException("Invalid value for column " + columns[i].getName());
 			}
-			if (values[i]->type != columns[i].getDataType()->getTypeName()) {
+			if (values[i]->m_type != columns[i].getDataType()->getTypeName()) {
 				throw DatabaseException("DataType not compatible during serialization");
 			}
 		}
@@ -287,7 +287,7 @@ void Executor::executeInsert(const InsertStatement& statement)
 				if (!values[i]) {
 					throw DatabaseException("Invalid value for column " + columnName);
 				}
-				if (values[i]->type != columns[i].getDataType()->getTypeName()) {
+				if (values[i]->m_type != columns[i].getDataType()->getTypeName()) {
 					throw DatabaseException("DataType not compatible during serialization");
 				}
 			}

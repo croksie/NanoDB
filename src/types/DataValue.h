@@ -7,9 +7,9 @@ enum Type { Number, Varchar};
 class DataValue
 {
 public:
-	const Type type;
+	const Type m_type;
 	
-	DataValue(Type t) : type(t) {};
+	DataValue(Type t) : m_type(t) {};
 	virtual ~DataValue() = default;
 	virtual std::any getValue() const = 0;
 	virtual std::string toString() const = 0;
@@ -18,20 +18,20 @@ public:
 
 class IntValue : public DataValue {
 public:
-	int val;
+	int m_val;
 
-	IntValue(int v) : DataValue(Type::Number), val(v) {}
+	IntValue(int v) : DataValue(Type::Number), m_val(v) {}
 
-	std::any getValue() const { return this->val; }
+	std::any getValue() const { return m_val; }
 	std::string toString() const;
 };
 
 class StringValue : public DataValue {
 public:
-	std::string val;
+	std::string m_val;
 
-	StringValue(std::string v) : DataValue(Type::Varchar), val(v) {}
+	StringValue(std::string v) : DataValue(Type::Varchar), m_val(v) {}
 
-	std::any getValue() const { return this->val; }
+	std::any getValue() const { return m_val; }
 	std::string toString() const;
 };

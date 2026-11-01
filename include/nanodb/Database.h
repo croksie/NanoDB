@@ -11,7 +11,7 @@
 class Database
 {
 public: 
-	BufferManager bm = BufferManager();
+	BufferManager m_bm;
 
 	Database();
 	void clear();
@@ -26,6 +26,6 @@ public:
 
 	void loadSystemsTables();
 private:
-	std::unordered_map<std::string, std::unique_ptr<Table>> tables;
+	std::unordered_map<std::string, std::unique_ptr<Table>> m_tables;
 };
 

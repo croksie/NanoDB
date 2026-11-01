@@ -1,17 +1,17 @@
 #include "Parser.h"
 #include "DatabaseException.h"
 
-Parser::Parser(std::vector<Token> tokens) : tokens(tokens){}
+Parser::Parser(std::vector<Token> tokens) : m_tokens(tokens){}
 
 Token Parser::peek()
 {
-	return this->tokens.at(this->current);
+	return m_tokens.at(m_current);
 }
 
 Token Parser::advance()
 {
 	Token token = this->peek();
-	this->current++;
+	m_current++;
 	return token;
 }
 
@@ -26,7 +26,7 @@ Token Parser::consume(TokenType type, std::string error_msg)
 	if (token.type != type) {
 		throw DatabaseException(error_msg);
 	}
-	this->current++;
+	m_current++;
 	return token;
 }
 
